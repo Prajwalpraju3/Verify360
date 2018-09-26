@@ -23,11 +23,14 @@ import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MainSectionAdapter;
 import com.covert.verify360.BeanClasses.FormElementDatum;
+import com.covert.verify360.BeanClasses.InnerSubSection;
 import com.covert.verify360.BeanClasses.Items;
 import com.covert.verify360.BeanClasses.PendingCaseDetails;
 import com.covert.verify360.BeanClasses.ResponseMessage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import Services.BusinessEnquiryService;
@@ -35,6 +38,7 @@ import Services.FactoryService;
 import Services.FinalRemarks;
 import Services.FormSubmissionService;
 import Services.IPendingCaseDetails;
+import Services.MFormSubmissionService;
 import Services.NeighbourCheckService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -139,6 +143,7 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
         progressBar.setVisibility(View.GONE);
+
         recyclerViewBusiness.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewBusiness.setHasFixedSize(true);
         recyclerViewBusiness.setNestedScrollingEnabled(false);
@@ -163,6 +168,96 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Cannot fetch Data", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void setData(String working_by, String case_id, String case_detail_id) {
+        progressBar.setVisibility(View.VISIBLE);
+        if (formElementData != null) {
+            formElementData.clear();
+        }
+        IPendingCaseDetails caseDetails = FactoryService.createService(IPendingCaseDetails.class);
+        Call<PendingCaseDetails> call = caseDetails.getPendingCases(working_by, case_id, case_detail_id);
+        call.enqueue(new Callback<PendingCaseDetails>() {
+            @Override
+            public void onResponse(Call<PendingCaseDetails> call, Response<PendingCaseDetails> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().getError()) {
+                        formElementData = response.body().getFormElementData();
+                        mainSectionAdapter = new MainSectionAdapter(CaseBusinessVerificationActivity.this,
+                                formElementData);
+                        recyclerViewBusiness.setAdapter(mainSectionAdapter);
+                        progressBar.setVisibility(View.GONE);
+                    } else {
+                        ViewGroup viewGroup = findViewById(R.id.nestedScrollView);
+                        viewGroup.removeAllViews();
+                        View errorView = LayoutInflater.from(CaseBusinessVerificationActivity.this).inflate(R.layout.layout_error, v, false);
+                        viewGroup.addView(errorView);
+                        Toast.makeText(CaseBusinessVerificationActivity.this, "Error showing form", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PendingCaseDetails> call, Throwable t) {
+                Toast.makeText(CaseBusinessVerificationActivity.this, "Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                ViewGroup viewGroup = findViewById(R.id.nestedScrollView);
+                viewGroup.removeAllViews();
+                View errorView = LayoutInflater.from(CaseBusinessVerificationActivity.this).inflate(R.layout.layout_error, v, false);
+                viewGroup.addView(errorView);
+            }
+        });
+    }
+
+    private void submitForm() {
+        Map<String, String> mMap = new HashMap<>();
+        if (formElementData != null && formElementData.size() > 0) {
+            for (int i = 0; i < formElementData.size(); i++) {
+                FormElementDatum datum = formElementData.get(i);
+                for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
+                    InnerSubSection section = datum.getOuterSubSection().get(j);
+                    String selectedId = "";
+                    String remark = "";
+                    for (int k = 0; k < section.getOptionssection().size(); k++) {
+                        if (section.getOptionssection().get(k).isSelected()) {
+                            selectedId = "" + section.getOptionssection().get(k).getFormElementId();
+                            remark = section.getBuilder();
+                            mMap.put(selectedId, remark);
+                        }
+                    }
+                }
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, String> entry :
+                mMap.entrySet()) {
+            builder.append(entry.getKey() + "~" + entry.getValue() + "|");
+        }
+        mSubmitRadioFields(builder.toString());
+    }
+
+    private void mSubmitRadioFields(String s) {
+        MFormSubmissionService submissionService = FactoryService.createService(MFormSubmissionService.class);
+        Call<ResponseMessage> call = submissionService.submitForm(case_id, case_detail_id, s,
+                working_by, 1);
+        call.enqueue(new Callback<ResponseMessage>() {
+            @Override
+            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().isError()) {
+                        Toast.makeText(CaseBusinessVerificationActivity.this,
+                                "Form details submitted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseMessage> call, Throwable t) {
+                Toast.makeText(CaseBusinessVerificationActivity.this,
+                        "Failed to submit details", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void submitBusinessEnquiry() {
@@ -440,19 +535,24 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
         }
     }
 
-    private void submitForm() {
-        List<Items> itemsList = mainSectionAdapter.getItems();
-        if (itemsList != null) {
-            for (Items items : itemsList) {
-                submitFields(items.getCheckedId(), items.getRemarks());
-//                Toast.makeText(this, items.getCheckedId() + "" + items.getRemarks(), Toast.LENGTH_SHORT).show();
-            }
-            Toast.makeText(this, "Form Submited successfully", Toast.LENGTH_SHORT).show();
-        } else Toast.makeText(this, "Please select form details", Toast.LENGTH_SHORT).show();
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
-    private void submitFields(int checkedRadioButtonId, String s) {
+    /*private void submitFields(int checkedRadioButtonId, String s) {
         FormSubmissionService submissionService = FactoryService.createService(FormSubmissionService.class);
         Call<ResponseMessage> call = submissionService.submitForm("1",
                 case_id, case_detail_id, Integer.toString(checkedRadioButtonId), s, working_by);
@@ -469,59 +569,7 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
                 Toast.makeText(CaseBusinessVerificationActivity.this, "Failed to submit details", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void setData(String working_by, String case_id, String case_detail_id) {
-        progressBar.setVisibility(View.VISIBLE);
-        if (formElementData != null) {
-            formElementData.clear();
-        }
-        IPendingCaseDetails caseDetails = FactoryService.createService(IPendingCaseDetails.class);
-        Call<PendingCaseDetails> call = caseDetails.getPendingCases(working_by, case_id, case_detail_id);
-        call.enqueue(new Callback<PendingCaseDetails>() {
-            @Override
-            public void onResponse(Call<PendingCaseDetails> call, Response<PendingCaseDetails> response) {
-                if (response.isSuccessful()) {
-                    if (!response.body().getError()) {
-                        formElementData = response.body().getFormElementData();
-                        mainSectionAdapter = new MainSectionAdapter(CaseBusinessVerificationActivity.this,
-                                formElementData);
-                        recyclerViewBusiness.setAdapter(mainSectionAdapter);
-                        progressBar.setVisibility(View.GONE);
-                    } else {
-                        ViewGroup viewGroup = findViewById(R.id.nestedScrollView);
-                        viewGroup.removeAllViews();
-                        View errorView = LayoutInflater.from(CaseBusinessVerificationActivity.this).inflate(R.layout.layout_error, v, false);
-                        viewGroup.addView(errorView);
-                        Toast.makeText(CaseBusinessVerificationActivity.this, "Error showing form", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PendingCaseDetails> call, Throwable t) {
-                Toast.makeText(CaseBusinessVerificationActivity.this, "Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-                ViewGroup viewGroup = findViewById(R.id.nestedScrollView);
-                viewGroup.removeAllViews();
-                View errorView = LayoutInflater.from(CaseBusinessVerificationActivity.this).inflate(R.layout.layout_error, v, false);
-                viewGroup.addView(errorView);
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
+    }*/
 
 }
 

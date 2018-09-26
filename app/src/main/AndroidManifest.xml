@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.covert.verify360">
 
     <uses-feature
@@ -22,7 +23,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".VerifyApp">
+        android:name=".VerifyApp"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".SplashScreenActivity"
@@ -37,11 +39,11 @@
         <activity
             android:name=".LoginActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@style/LoginScreen" ></activity>
+            android:theme="@style/LoginScreen" />
 
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden" ></activity>
+            android:configChanges="orientation|keyboard|keyboardHidden" />
 
         <activity
             android:name=".CaseBusinessVerificationActivity"
@@ -84,7 +86,8 @@
 
         <receiver android:name=".NetworkChangleReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
             </intent-filter>
         </receiver>
 

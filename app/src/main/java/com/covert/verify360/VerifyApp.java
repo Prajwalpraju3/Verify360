@@ -1,7 +1,13 @@
 package com.covert.verify360;
 
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
 
-public class VerifyApp extends MultiDexApplication {
+public class VerifyApp extends Application {
+
+    /*@Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }*/
 
 }

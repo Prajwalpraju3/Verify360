@@ -260,7 +260,58 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
                 viewGroup.addView(errorView);
             }
         });
+    }
 
+    private void submitForm() {
+        Map<String, String> mMap = new HashMap<>();
+        if (formElementData != null && formElementData.size() > 0) {
+            for (int i = 0; i < formElementData.size(); i++) {
+                FormElementDatum datum = formElementData.get(i);
+                for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
+                    InnerSubSection section = datum.getOuterSubSection().get(j);
+                    String selectedId = "";
+                    String remark = "";
+                    for (int k = 0; k < section.getOptionssection().size(); k++) {
+                        if (section.getOptionssection().get(k).isSelected()){
+                            selectedId = "" + section.getOptionssection().get(k).getFormElementId();
+                            remark = section.getBuilder();
+                            mMap.put(selectedId, remark);
+                        }
+                    }
+                }
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, String> entry :
+                mMap.entrySet()) {
+            builder.append(entry.getKey() + "~" + entry.getValue() + "|");
+        }
+        submitFields(builder.toString());
+    }
+
+
+    private void submitFields(String s) {
+        MFormSubmissionService submissionService = FactoryService.createService(MFormSubmissionService.class);
+        Call<ResponseMessage> call = submissionService.submitForm(case_id, case_detail_id, s,
+                working_by, 1);
+        call.enqueue(new Callback<ResponseMessage>() {
+            @Override
+            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().isError()) {
+                        Toast.makeText(CaseResidentVerificationActivity.this,
+                                "Form details submitted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseMessage> call, Throwable t) {
+                Toast.makeText(CaseResidentVerificationActivity.this,
+                        "Failed to submit details", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void submitNeighbourDetails() {
@@ -506,59 +557,6 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
             });
         }
     }
-
-    private void submitForm() {
-        Map<String, String> mMap = new HashMap<>();
-        if (formElementData != null && formElementData.size() > 0) {
-            for (int i = 0; i < formElementData.size(); i++) {
-                FormElementDatum datum = formElementData.get(i);
-                for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
-                    InnerSubSection section = datum.getOuterSubSection().get(j);
-                    String selectedId = "";
-                    String remark = "";
-                    for (int k = 0; k < section.getOptionssection().size(); k++) {
-                        if (section.getOptionssection().get(k).isSelected()){
-                            selectedId = "" + section.getOptionssection().get(k).getFormElementId();
-                            remark = section.getBuilder();
-                            mMap.put(selectedId, remark);
-                        }
-                    }
-                }
-            }
-        }
-
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, String> entry :
-                mMap.entrySet()) {
-            builder.append(entry.getKey() + "~" + entry.getValue() + "|");
-        }
-        submitFields(builder.toString());
-    }
-
-
-    private void submitFields(String s) {
-        MFormSubmissionService submissionService = FactoryService.createService(MFormSubmissionService.class);
-        Call<ResponseMessage> call = submissionService.submitForm(case_id, case_detail_id, s,
-                working_by, 1);
-        call.enqueue(new Callback<ResponseMessage>() {
-            @Override
-            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
-                if (response.isSuccessful()) {
-                    if (!response.body().isError()) {
-                    Toast.makeText(CaseResidentVerificationActivity.this,
-                            "Form details submitted", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseMessage> call, Throwable t) {
-                Toast.makeText(CaseResidentVerificationActivity.this,
-                        "Failed to submit details", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
 
     private void uploadImages(){
         if (imageList.size()<=0){
