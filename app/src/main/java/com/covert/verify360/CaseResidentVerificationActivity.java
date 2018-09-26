@@ -29,45 +29,33 @@ import com.covert.verify360.AdapterClasses.MainSectionAdapter;
 import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.FormElementDatum;
 import com.covert.verify360.BeanClasses.InnerSubSection;
-import com.covert.verify360.BeanClasses.OuterSubSec;
 import com.covert.verify360.BeanClasses.PendingCaseDetails;
 import com.covert.verify360.BeanClasses.ResponseMessage;
 import com.fxn.pix.Pix;
 import com.fxn.utility.PermUtil;
 
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 import Services.EnquiryDetailsService;
 import Services.FactoryService;
 import Services.FinalRemarks;
-import Services.FormSubmissionService;
 import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
 import Services.NeighbourCheckService;
 import Services.UploadImage;
-import Utils.BaseUrl;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class CaseResidentVerificationActivity extends AppCompatActivity {
     @BindView(R.id.linearLayoutresident)
@@ -193,18 +181,8 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         buttonEnquiryResident.setOnClickListener(v2 -> submitEnquiryDetails());
         buttonNeighbourCheck.setOnClickListener(v3 -> submitNeighbourDetails());
         buttonfinalStatus.setOnClickListener(v4 -> submitFinalStatus());
-        add_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Pix.start(CaseResidentVerificationActivity.this, 50, 5);
-            }
-        });
-        upload_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImages();
-            }
-        });
+        add_image.setOnClickListener(v -> Pix.start(CaseResidentVerificationActivity.this, 50, 5));
+        upload_image.setOnClickListener(v -> uploadImages());
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
 

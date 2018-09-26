@@ -1,10 +1,13 @@
 package com.covert.verify360;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -22,21 +25,34 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MainSectionAdapter;
+import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.FormElementDatum;
+import com.covert.verify360.BeanClasses.InnerSubSection;
 import com.covert.verify360.BeanClasses.Items;
 import com.covert.verify360.BeanClasses.PendingCaseDetails;
 import com.covert.verify360.BeanClasses.ResponseMessage;
+import com.fxn.pix.Pix;
+import com.fxn.utility.PermUtil;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import Services.FactoryService;
 import Services.FinalRemarks;
 import Services.FormSubmissionService;
 import Services.IPendingCaseDetails;
+import Services.MFormSubmissionService;
 import Services.PaySlipenquiryService;
+import Services.UploadImage;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -77,6 +93,12 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     @BindView(R.id.additionalRemarks)
     EditText finaladditionalRemarks;
 
+    @BindView(R.id.image_list)
+    RecyclerView image_list;
+    @BindView(R.id.add_image)
+    Button add_image;
+    @BindView(R.id.upload_image)
+    Button upload_image;
 
     private String case_id;
     private String case_detail_id;
@@ -85,7 +107,8 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private MainSectionAdapter mainSectionAdapter;
     private List<FormElementDatum> formElementData;
-
+    private MyAdapter imageAdapter;
+    private ArrayList<String> imageList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,9 +125,17 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         recyclerViewPaySlip.setNestedScrollingEnabled(false);
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
-//        buttonSubmitform.setOnClickListener(v1 -> submitForm());
+        buttonSubmitform.setOnClickListener(v1 -> submitForm());
         buttonSubmitPaySlipDetails.setOnClickListener(v1 -> submitPaySlipEnquiry());
         buttonfinalStatus.setOnClickListener(v2 -> submitfinalStatus());
+        add_image.setOnClickListener(v -> Pix.start(CasePaySlipVerificationActivity.this, 50, 5));
+        upload_image.setOnClickListener(v -> uploadImages());
+
+        // Image adapter
+        image_list.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        imageList = new ArrayList<>();
+        imageAdapter = new MyAdapter(this, imageList);
+        image_list.setAdapter(imageAdapter);
 
         intent = getIntent();
         if (intent != null) {
@@ -214,6 +245,58 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     }
 
     private void submitForm() {
+        Map<String, String> mMap = new HashMap<>();
+        if (formElementData != null && formElementData.size() > 0) {
+            for (int i = 0; i < formElementData.size(); i++) {
+                FormElementDatum datum = formElementData.get(i);
+                for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
+                    InnerSubSection section = datum.getOuterSubSection().get(j);
+                    String selectedId = "";
+                    String remark = "";
+                    for (int k = 0; k < section.getOptionssection().size(); k++) {
+                        if (section.getOptionssection().get(k).isSelected()){
+                            selectedId = "" + section.getOptionssection().get(k).getFormElementId();
+                            remark = section.getBuilder();
+                            mMap.put(selectedId, remark);
+                        }
+                    }
+                }
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, String> entry :
+                mMap.entrySet()) {
+            builder.append(entry.getKey() + "~" + entry.getValue() + "|");
+        }
+        submitFields(builder.toString());
+    }
+
+
+    private void submitFields(String s) {
+        MFormSubmissionService submissionService = FactoryService.createService(MFormSubmissionService.class);
+        Call<ResponseMessage> call = submissionService.submitForm(case_id, case_detail_id, s,
+                working_by, 1);
+        call.enqueue(new Callback<ResponseMessage>() {
+            @Override
+            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().isError()) {
+                        Toast.makeText(CasePaySlipVerificationActivity.this,
+                                "Form details submitted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseMessage> call, Throwable t) {
+                Toast.makeText(CasePaySlipVerificationActivity.this,
+                        "Failed to submit details", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /*private void submitForm() {
         List<Items> itemsList = mainSectionAdapter.getItems();
         if (itemsList != null) {
             for (Items items : itemsList) {
@@ -223,9 +306,9 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
             Toast.makeText(this, "Form Submited successfully", Toast.LENGTH_SHORT).show();
         } else Toast.makeText(this, "Please select form details", Toast.LENGTH_SHORT).show();
 
-    }
+    }*/
 
-    private void submitFields(int checkedRadioButtonId, String s) {
+    /*private void submitFields(int checkedRadioButtonId, String s) {
         FormSubmissionService submissionService = FactoryService.createService(FormSubmissionService.class);
         Call<ResponseMessage> call = submissionService.submitForm("1", case_id, case_detail_id, Integer.toString(checkedRadioButtonId), s, working_by);
         call.enqueue(new Callback<ResponseMessage>() {
@@ -239,6 +322,55 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseMessage> call, Throwable t) {
                 Toast.makeText(CasePaySlipVerificationActivity.this, "Failed to submit details", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }*/
+
+    private void uploadImages(){
+        if (imageList.size()<=0){
+            Toast.makeText(this, "Choose image first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (int i = 0; i < imageList.size(); i++) {
+            uploadImage(new File(imageList.get(i)), "doc for text", 1.002, 2.002);
+        }
+    }
+
+    private void uploadImage(File file, String docFor, double lat, double lon){
+        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
+                file.getName(),
+                reqFile);
+
+        UploadImage submissionService = FactoryService.createFileService(UploadImage.class);
+
+        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+        RequestBody xCaseID = RequestBody.create(MediaType.parse("text/plain"), case_id);
+        RequestBody xCaseDetailsId = RequestBody.create(MediaType.parse("text/plain"), case_detail_id);
+        RequestBody xDocFor = RequestBody.create(MediaType.parse("text/plain"), docFor);
+        RequestBody xWorkingBy = RequestBody.create(MediaType.parse("text/plain"), working_by);
+        RequestBody xLat = RequestBody.create(MediaType.parse("text/plain"), ""+lat);
+        RequestBody xLon = RequestBody.create(MediaType.parse("text/plain"), ""+lon);
+        Call<ResponseMessage> call = submissionService.uploadImage(body, name,
+                xCaseID, xCaseDetailsId,
+                xDocFor, xWorkingBy, xLat, xLon);
+        call.enqueue(new Callback<ResponseMessage>() {
+            @Override
+            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().isError()) {
+                        Toast.makeText(CasePaySlipVerificationActivity.this,
+                                "Form details submitted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseMessage> call, Throwable t) {
+                t.printStackTrace();
+                /*Toast.makeText(CaseResidentVerificationActivity.this,
+                        "Failed to submit details", Toast.LENGTH_SHORT).show();*/
             }
         });
     }
@@ -257,7 +389,8 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
 
                     if (!response.body().getError()) {
                         formElementData = response.body().getFormElementData();
-                        mainSectionAdapter = new MainSectionAdapter(CasePaySlipVerificationActivity.this, formElementData);
+                        mainSectionAdapter = new MainSectionAdapter(CasePaySlipVerificationActivity.this,
+                                formElementData);
                         recyclerViewPaySlip.setAdapter(mainSectionAdapter);
                         progressBar.setVisibility(View.GONE);
                     } else {
@@ -284,9 +417,33 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (50): {
+                if (resultCode == Activity.RESULT_OK) {
+                    ArrayList<String> returnValue = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
+                    imageAdapter.addImages(returnValue);
+                }
+            }
+            break;
+        }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Pix.start(CasePaySlipVerificationActivity.this, 100, 5);
+                } else {
+                    Toast.makeText(CasePaySlipVerificationActivity.this,
+                            "Approve permissions to add image", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+        }
     }
 
     @Override
