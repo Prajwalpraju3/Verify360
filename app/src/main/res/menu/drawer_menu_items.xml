@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/newCasesFragment"
+            android:title="New Cases" />
+        <item
+            android:id="@+id/pendingCasesFragment"
+            android:title="Pending Cases" />
+        <item
+            android:id="@+id/completedCasesFragment"
+            android:title="Completed Cases" />
+        <item
+            android:id="@+id/cancelledCasesFragment"
+            android:title="Cancelled Cases" />
+        <item
+            android:id="@+id/reAssignedCasesFragment"
+            android:title="Re-Assigned Cases" />
+        <item
+            android:id="@+id/reOpenedCasesFragment"
+            android:title="Re-Opened Cases" />
+        <item
+            android:id="@+id/reportsFragment"
+            android:title="Reports" />
+        <item
+            android:id="@+id/earningsFragment"
+            android:title="Earnings" />
+        <item
+            android:id="@+id/profileSettingsFragment"
+            android:title="Settings" />
+
+        <item
+            android:id="@+id/logout"
+            android:title="Logout" />
+    </group>
+
+</menu>
