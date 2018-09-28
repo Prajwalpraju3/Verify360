@@ -288,15 +288,15 @@ public class MainActivity extends AppCompatActivity {
             int count = getSupportFragmentManager().getBackStackEntryCount();
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START);
-            } else if (count == 0) {
+            } else /*if (count == 0)*/ {
                 super.onBackPressed();
-            } else {
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_fragment);
+            } /*else {
+                *//*Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_fragment);
                 if (fragment.equals(fragmentDashboard)) {
                     super.onBackPressed();
-                }
+                }*//*
                 getSupportFragmentManager().beginTransaction().replace(R.id.container_fragment, fragmentDashboard).commit();
-            }
+            }*/
         }
 
         @Override
