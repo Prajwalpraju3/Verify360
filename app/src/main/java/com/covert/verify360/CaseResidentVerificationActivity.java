@@ -48,6 +48,7 @@ import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
 import Services.NeighbourCheckService;
 import Services.UploadImage;
+import Utils.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.MediaType;
@@ -140,7 +141,7 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
     RecyclerView image_list;
     @BindView(R.id.add_image)
     Button add_image;
-    @BindView(R.id.upload_image)
+    @BindView(R.id.upload_data)
     Button upload_image;
 
     @BindView(android.R.id.content)
@@ -181,8 +182,8 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         buttonEnquiryResident.setOnClickListener(v2 -> submitEnquiryDetails());
         buttonNeighbourCheck.setOnClickListener(v3 -> submitNeighbourDetails());
         buttonfinalStatus.setOnClickListener(v4 -> submitFinalStatus());
-        add_image.setOnClickListener(v -> Pix.start(CaseResidentVerificationActivity.this, 50, 5));
-        upload_image.setOnClickListener(v -> uploadImages());
+//        add_image.setOnClickListener(v -> Pix.start(CaseResidentVerificationActivity.this, 50, 5));
+//        upload_data.setOnClickListener(v -> uploadImages());
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
 
@@ -199,6 +200,19 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Cannot fetch Data", Toast.LENGTH_SHORT).show();
         }
+
+        add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent locPhotoIntent = new Intent(CaseResidentVerificationActivity.this,
+                        LocationPhotoActivity.class);
+                locPhotoIntent.putExtra(Constants.KEY_SELCTOR, 0);
+                locPhotoIntent.putExtra(Constants.KEY_CASE_ID, case_id);
+                locPhotoIntent.putExtra(Constants.KEY_CASE_DETAIL_ID, case_detail_id);
+                locPhotoIntent.putExtra(Constants.KEY_WORKING_BY, working_by);
+                startActivity(locPhotoIntent);
+            }
+        });
     }
 
     private void setData(String working_by, String case_id, String case_detail_id) {

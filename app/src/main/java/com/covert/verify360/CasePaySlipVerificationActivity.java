@@ -28,7 +28,6 @@ import com.covert.verify360.AdapterClasses.MainSectionAdapter;
 import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.FormElementDatum;
 import com.covert.verify360.BeanClasses.InnerSubSection;
-import com.covert.verify360.BeanClasses.Items;
 import com.covert.verify360.BeanClasses.PendingCaseDetails;
 import com.covert.verify360.BeanClasses.ResponseMessage;
 import com.fxn.pix.Pix;
@@ -43,7 +42,6 @@ import java.util.Objects;
 
 import Services.FactoryService;
 import Services.FinalRemarks;
-import Services.FormSubmissionService;
 import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
 import Services.PaySlipenquiryService;
@@ -97,7 +95,7 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     RecyclerView image_list;
     @BindView(R.id.add_image)
     Button add_image;
-    @BindView(R.id.upload_image)
+    @BindView(R.id.upload_data)
     Button upload_image;
 
     private String case_id;

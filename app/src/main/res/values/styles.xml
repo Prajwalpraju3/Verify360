@@ -18,14 +18,27 @@
 
     <style name="LoginScreen" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@android:color/white</item>
-    <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/black</item>
         <item name="android:colorControlNormal">@android:color/black</item>
         <item name="android:colorControlActivated">@color/colorPrimary</item>
     </style>
+
     <style name="textHeading" parent="AppTheme">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">24sp</item>
-       <item name="android:typeface">monospace</item>
+        <item name="android:typeface">monospace</item>
         <item name="android:textColor">@android:color/black</item>
-          </style>
+    </style>
+
+    <style name="CustomProgressDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>
