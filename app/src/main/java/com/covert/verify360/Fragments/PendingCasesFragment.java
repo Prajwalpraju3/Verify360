@@ -78,7 +78,6 @@ public class PendingCasesFragment extends Fragment {
         setPendingData(working_by);
 
         db_instance.pendingCasesDao().getCasesFromDB().observe(getActivity(), pendingcases -> {
-
             pendingCasesBeanList = pendingcases;
             pendingCasesAdapter = new PendingCasesAdapter(pendingCasesBeanList,
                     PendingCasesFragment.this.getActivity());

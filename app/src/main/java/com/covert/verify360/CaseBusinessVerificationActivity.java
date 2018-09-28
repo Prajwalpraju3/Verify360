@@ -180,6 +180,13 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
         buttonsubmitEnquiry.setOnClickListener(v3 -> submitBusinessEnquiry());
         add_image.setOnClickListener(v -> Pix.start(CaseBusinessVerificationActivity.this,
                 50, 5));
+        /*add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CaseBusinessVerificationActivity.this, LocationPhotoActivity.class);
+                startActivity(intent);
+            }
+        });*/
         upload_image.setOnClickListener(v -> uploadImages());
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);

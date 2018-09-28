@@ -386,7 +386,6 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PendingCaseDetails> call, Response<PendingCaseDetails> response) {
                 if (response.isSuccessful()) {
-
                     if (!response.body().getError()) {
                         formElementData = response.body().getFormElementData();
                         mainSectionAdapter = new MainSectionAdapter(CasePaySlipVerificationActivity.this,

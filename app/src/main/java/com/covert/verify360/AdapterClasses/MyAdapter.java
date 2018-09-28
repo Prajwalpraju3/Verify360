@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.covert.verify360.R;
 
 import java.io.File;
@@ -46,12 +47,14 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //Uri imageUri = Uri.fromFile(new File(list.get(position)));// For files on device
         //Log.e("hello", "- " + imageUri.toString());
-        File f = new File(list.get(position));
+
+        /*File f = new File(list.get(position));
         Bitmap d = new BitmapDrawable(context.getResources(), f.getAbsolutePath()).getBitmap();
         //Bitmap scaled = com.fxn.utility.Utility.getScaledBitmap(512, com.fxn.utility.Utility.getExifCorrectedBitmap(f));
         Bitmap scaled = com.fxn.utility.Utility.getScaledBitmap(150, d);
         ((Holder) holder).iv.setImageBitmap(scaled);
-        // ((Holder) holder).iv.setImageURI(imageUri);
+        // ((Holder) holder).iv.setImageURI(imageUri);*/
+
         ((Holder) holder).remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +62,8 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 notifyDataSetChanged();
             }
         });
+        System.out.println("Mayur: path " + position + " " + list.get(position));
+        Glide.with(context).load(list.get(position)).into(((Holder) holder).iv);
     }
 
     @Override

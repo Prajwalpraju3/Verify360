@@ -6,6 +6,8 @@
     <uses-feature
         android:name="android.hardware.camera2"
         android:required="true" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -77,12 +79,24 @@
         <activity android:name=".MapsActivity">
 
         </activity>
+        <activity android:name=".LocationPhotoActivity" />
 
 
         <provider
             android:name=".NewContentProvider"
             android:authorities="com.covert.verify360"
             android:exported="true" />
+        
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.covert.verify360.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+            </meta-data>
+        </provider>
 
         <receiver android:name=".NetworkChangleReceiver">
             <intent-filter>

@@ -41,7 +41,7 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
                 boolean isSelected = ((CompoundButton)v).isChecked();
                 if (isSelected) {
                     check(position);
-                    notifyDataSetChanged();
+//                    notifyDataSetChanged();
                 }
             }
         });
