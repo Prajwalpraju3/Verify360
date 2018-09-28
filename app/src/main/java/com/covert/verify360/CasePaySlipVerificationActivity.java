@@ -46,6 +46,7 @@ import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
 import Services.PaySlipenquiryService;
 import Services.UploadImage;
+import Utils.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.MediaType;
@@ -91,12 +92,8 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     @BindView(R.id.additionalRemarks)
     EditText finaladditionalRemarks;
 
-    @BindView(R.id.image_list)
-    RecyclerView image_list;
     @BindView(R.id.add_image)
     Button add_image;
-    @BindView(R.id.upload_data)
-    Button upload_image;
 
     private String case_id;
     private String case_detail_id;
@@ -105,8 +102,6 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private MainSectionAdapter mainSectionAdapter;
     private List<FormElementDatum> formElementData;
-    private MyAdapter imageAdapter;
-    private ArrayList<String> imageList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,14 +121,6 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         buttonSubmitform.setOnClickListener(v1 -> submitForm());
         buttonSubmitPaySlipDetails.setOnClickListener(v1 -> submitPaySlipEnquiry());
         buttonfinalStatus.setOnClickListener(v2 -> submitfinalStatus());
-        add_image.setOnClickListener(v -> Pix.start(CasePaySlipVerificationActivity.this, 50, 5));
-        upload_image.setOnClickListener(v -> uploadImages());
-
-        // Image adapter
-        image_list.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        imageList = new ArrayList<>();
-        imageAdapter = new MyAdapter(this, imageList);
-        image_list.setAdapter(imageAdapter);
 
         intent = getIntent();
         if (intent != null) {
@@ -148,6 +135,19 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Cannot fetch Data", Toast.LENGTH_SHORT).show();
         }
+
+        add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CasePaySlipVerificationActivity.this,
+                        LocationPhotoActivity.class);
+                intent.putExtra(Constants.KEY_SELCTOR, 2);
+                intent.putExtra(Constants.KEY_CASE_ID, case_id);
+                intent.putExtra(Constants.KEY_CASE_DETAIL_ID, case_detail_id);
+                intent.putExtra(Constants.KEY_WORKING_BY, working_by);
+                startActivity(intent);
+            }
+        });
     }
 
     private void submitPaySlipEnquiry() {
@@ -324,55 +324,6 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         });
     }*/
 
-    private void uploadImages(){
-        if (imageList.size()<=0){
-            Toast.makeText(this, "Choose image first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        for (int i = 0; i < imageList.size(); i++) {
-            uploadImage(new File(imageList.get(i)), "doc for text", 1.002, 2.002);
-        }
-    }
-
-    private void uploadImage(File file, String docFor, double lat, double lon){
-        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
-                file.getName(),
-                reqFile);
-
-        UploadImage submissionService = FactoryService.createFileService(UploadImage.class);
-
-        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-        RequestBody xCaseID = RequestBody.create(MediaType.parse("text/plain"), case_id);
-        RequestBody xCaseDetailsId = RequestBody.create(MediaType.parse("text/plain"), case_detail_id);
-        RequestBody xDocFor = RequestBody.create(MediaType.parse("text/plain"), docFor);
-        RequestBody xWorkingBy = RequestBody.create(MediaType.parse("text/plain"), working_by);
-        RequestBody xLat = RequestBody.create(MediaType.parse("text/plain"), ""+lat);
-        RequestBody xLon = RequestBody.create(MediaType.parse("text/plain"), ""+lon);
-        Call<ResponseMessage> call = submissionService.uploadImage(body, name,
-                xCaseID, xCaseDetailsId,
-                xDocFor, xWorkingBy, xLat, xLon);
-        call.enqueue(new Callback<ResponseMessage>() {
-            @Override
-            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
-                if (response.isSuccessful()) {
-                    if (!response.body().isError()) {
-                        Toast.makeText(CasePaySlipVerificationActivity.this,
-                                "Form details submitted", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseMessage> call, Throwable t) {
-                t.printStackTrace();
-                /*Toast.makeText(CaseResidentVerificationActivity.this,
-                        "Failed to submit details", Toast.LENGTH_SHORT).show();*/
-            }
-        });
-    }
-
     private void setData(String working_by, String case_id, String case_detail_id) {
         progressBar.setVisibility(View.VISIBLE);
         if (formElementData != null) {
@@ -411,36 +362,6 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case (50): {
-                if (resultCode == Activity.RESULT_OK) {
-                    ArrayList<String> returnValue = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
-                    imageAdapter.addImages(returnValue);
-                }
-            }
-            break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Pix.start(CasePaySlipVerificationActivity.this, 100, 5);
-                } else {
-                    Toast.makeText(CasePaySlipVerificationActivity.this,
-                            "Approve permissions to add image", Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
-        }
     }
 
     @Override

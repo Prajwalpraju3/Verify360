@@ -1,13 +1,10 @@
 package com.covert.verify360;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -25,16 +22,11 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MainSectionAdapter;
-import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.FormElementDatum;
 import com.covert.verify360.BeanClasses.InnerSubSection;
 import com.covert.verify360.BeanClasses.PendingCaseDetails;
 import com.covert.verify360.BeanClasses.ResponseMessage;
-import com.fxn.pix.Pix;
-import com.fxn.utility.PermUtil;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +38,9 @@ import Services.FinalRemarks;
 import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
 import Services.NeighbourCheckService;
-import Services.UploadImage;
+import Utils.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -132,25 +121,19 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
     @BindView(R.id.radioGroupRowdism1)
     RadioGroup radioGroupRowdism1;
 
-    @BindView(R.id.image_list)
-    RecyclerView image_list;
-    @BindView(R.id.add_image)
-    Button add_image;
-    @BindView(R.id.upload_data)
-    Button upload_image;
-
     @BindView(R.id.finalStatusRadioGroup)
     RadioGroup radioGroupfinalStatus;
     @BindView(R.id.additionalRemarks)
     EditText finaladditionalRemarks;
+
+    @BindView(R.id.add_image)
+    Button add_image;
 
 
     private Intent intent;
     private SharedPreferences sharedPreferences;
     private MainSectionAdapter mainSectionAdapter;
     private List<FormElementDatum> formElementData;
-    private MyAdapter imageAdapter;
-    private ArrayList<String> imageList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,25 +150,10 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
         recyclerViewBusiness.setHasFixedSize(true);
         recyclerViewBusiness.setNestedScrollingEnabled(false);
 
-        image_list.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        imageList = new ArrayList<>();
-        imageAdapter = new MyAdapter(this, imageList);
-        image_list.setAdapter(imageAdapter);
-
         buttonsubmitForm.setOnClickListener(v1 -> submitForm());
         buttonNeighbourCheck.setOnClickListener(v1 -> submitNeighbourdetails());
         buttonfinalStatus.setOnClickListener(v2 -> submitfinalStatus());
         buttonsubmitEnquiry.setOnClickListener(v3 -> submitBusinessEnquiry());
-        add_image.setOnClickListener(v -> Pix.start(CaseBusinessVerificationActivity.this,
-                50, 5));
-        /*add_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CaseBusinessVerificationActivity.this, LocationPhotoActivity.class);
-                startActivity(intent);
-            }
-        });*/
-        upload_image.setOnClickListener(v -> uploadImages());
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
         intent = getIntent();
@@ -202,6 +170,19 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Cannot fetch Data", Toast.LENGTH_SHORT).show();
         }
+
+        add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CaseBusinessVerificationActivity.this,
+                        LocationPhotoActivity.class);
+                intent.putExtra(Constants.KEY_SELCTOR, 1);
+                intent.putExtra(Constants.KEY_CASE_ID, case_id);
+                intent.putExtra(Constants.KEY_CASE_DETAIL_ID, case_detail_id);
+                intent.putExtra(Constants.KEY_WORKING_BY, working_by);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setData(String working_by, String case_id, String case_detail_id) {
@@ -355,55 +336,6 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private void uploadImages(){
-        if (imageList.size()<=0){
-            Toast.makeText(this, "Choose image first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        for (int i = 0; i < imageList.size(); i++) {
-            uploadImage(new File(imageList.get(i)), "doc for text", 1.002, 2.002);
-        }
-    }
-
-    private void uploadImage(File file, String docFor, double lat, double lon){
-        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
-                file.getName(),
-                reqFile);
-
-        UploadImage submissionService = FactoryService.createFileService(UploadImage.class);
-
-        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-        RequestBody xCaseID = RequestBody.create(MediaType.parse("text/plain"), case_id);
-        RequestBody xCaseDetailsId = RequestBody.create(MediaType.parse("text/plain"), case_detail_id);
-        RequestBody xDocFor = RequestBody.create(MediaType.parse("text/plain"), docFor);
-        RequestBody xWorkingBy = RequestBody.create(MediaType.parse("text/plain"), working_by);
-        RequestBody xLat = RequestBody.create(MediaType.parse("text/plain"), ""+lat);
-        RequestBody xLon = RequestBody.create(MediaType.parse("text/plain"), ""+lon);
-        Call<ResponseMessage> call = submissionService.uploadImage(body, name,
-                xCaseID, xCaseDetailsId,
-                xDocFor, xWorkingBy, xLat, xLon);
-        call.enqueue(new Callback<ResponseMessage>() {
-            @Override
-            public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
-                if (response.isSuccessful()) {
-                    if (!response.body().isError()) {
-                        Toast.makeText(CaseBusinessVerificationActivity.this,
-                                "Form details submitted", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseMessage> call, Throwable t) {
-                t.printStackTrace();
-                /*Toast.makeText(CaseResidentVerificationActivity.this,
-                        "Failed to submit details", Toast.LENGTH_SHORT).show();*/
-            }
-        });
     }
 
     private void submitfinalStatus() {
@@ -615,36 +547,6 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
                 }
             });
 
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case (50): {
-                if (resultCode == Activity.RESULT_OK) {
-                    ArrayList<String> returnValue = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
-                    imageAdapter.addImages(returnValue);
-                }
-            }
-            break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Pix.start(CaseBusinessVerificationActivity.this, 100, 5);
-                } else {
-                    Toast.makeText(CaseBusinessVerificationActivity.this,
-                            "Approve permissions to add image", Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
         }
     }
 
