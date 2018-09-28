@@ -1,5 +1,6 @@
 package com.covert.verify360.Fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,8 +31,9 @@ public class FragmentDashboard extends Fragment {
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit());
-        pendingCases.setOnClickListener(vl -> getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_fragment,new PendingCasesFragment(),"new cases")
+        pendingCases.setOnClickListener(vl ->
+                getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_fragment,new PendingCasesFragment(),"Pending cases")
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit());

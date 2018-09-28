@@ -55,6 +55,7 @@ public class PendingCasesFragment extends Fragment {
         setRetainInstance(true);
         pendingCasesBeanList = new ArrayList<>();
         db_instance = DatabaseHandler.getDatabaseInstance(getActivity());
+        AsyncTask.execute(() -> db_instance.pendingCasesDao().deleteAllCases());
     }
 
     @Override
