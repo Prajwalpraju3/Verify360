@@ -1,16 +1,23 @@
 package com.covert.verify360;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,14 +25,31 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.ResponseMessage;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +95,14 @@ public class LocationPhotoActivity extends AppCompatActivity {
 
     private int selector = -1;
     private String caseId, caseDetailId, workingBy;
-    private double lat=11.0, lon=11.0;
+    private double lat, lon;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    private SettingsClient mSettingsClient;
+    private LocationRequest mLocationRequest;
+    private LocationSettingsRequest mLocationSettingsRequest;
+    private LocationCallback mLocationCallback;
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,6 +123,7 @@ public class LocationPhotoActivity extends AppCompatActivity {
         imageList = new ArrayList<>();
         imageAdapter = new MyAdapter(this, imageList);
         image_list.setAdapter(imageAdapter);
+
     }
 
     @OnClick(R.id.add_image)
@@ -142,6 +174,137 @@ public class LocationPhotoActivity extends AppCompatActivity {
         return isAllAllowed;
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean checkLocPermission() {
+        boolean isAllAllowed = false;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            isAllAllowed = false;
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        59);
+            } else {
+                Toast.makeText(this,
+                        "Please go to application settings & provide permissions",
+                        Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            isAllAllowed = true;
+        }
+        return isAllAllowed;
+    }
+
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
+    private static final int REQUEST_CHECK_SETTINGS = 100;
+
+    private void initLocation(){
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mSettingsClient = LocationServices.getSettingsClient(this);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                // location is received
+                mCurrentLocation = locationResult.getLastLocation();
+                if (mCurrentLocation != null){
+                    lat = mCurrentLocation.getLatitude();
+                    lon = mCurrentLocation.getLongitude();
+                    System.out.println("Mayur: mLat: "+lat);
+                    System.out.println("Mayur: mLon: "+lon);
+                    Toast.makeText(LocationPhotoActivity.this, "Location fetched", Toast.LENGTH_SHORT).show();
+                    uploadImages();
+                    stopLocationUpdates();
+                }
+            }
+        };
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        mLocationSettingsRequest = builder.build();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showProgressDialog();
+                startLocUpdate();
+            }
+        }, 1000);
+    }
+
+    private void startLocUpdate(){
+        mSettingsClient
+                .checkLocationSettings(mLocationSettingsRequest)
+                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+//                        Log.i(TAG, "All location settings are satisfied.");
+                        dismissDialog();
+                        Toast.makeText(getApplicationContext(), "Started location updates!", Toast.LENGTH_SHORT).show();
+
+                        //noinspection MissingPermission
+                        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                                mLocationCallback, Looper.myLooper());
+                        if (mCurrentLocation != null) {
+                            lat = mCurrentLocation.getLatitude();
+                            lon = mCurrentLocation.getLongitude();
+                        }
+
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        dismissDialog();
+                        int statusCode = ((ApiException) e).getStatusCode();
+                        switch (statusCode) {
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                /*Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
+                                        "location settings ");*/
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(), and check the
+                                    // result in onActivityResult().
+                                    ResolvableApiException rae = (ResolvableApiException) e;
+                                    rae.startResolutionForResult(LocationPhotoActivity.this,
+                                            REQUEST_CHECK_SETTINGS);
+                                } catch (IntentSender.SendIntentException sie) {
+//                                    Log.i(TAG, "PendingIntent unable to execute request.");
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                String errorMessage = "Location settings are inadequate, and cannot be " +
+                                        "fixed here. Fix in Settings.";
+//                                Log.e(TAG, errorMessage);
+
+//                                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (mCurrentLocation != null){
+                            lat = mCurrentLocation.getLatitude();
+                            lon = mCurrentLocation.getLongitude();
+                        }
+                    }
+                });
+    }
+
+    public void stopLocationUpdates() {
+        // Removing location updates
+        mFusedLocationClient
+                .removeLocationUpdates(mLocationCallback)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+    }
+
     /**
      * For creating file that will store the captured image
      *
@@ -165,11 +328,15 @@ public class LocationPhotoActivity extends AppCompatActivity {
 
     @OnClick(R.id.upload_data)
     public void uploadData() {
+        if (checkLocPermission()){
+            initLocation();
+        }
+
         // TODO: 9/29/2018 Get location here and once you get location, set lat-lon in lat, lon variables
         // and then call uploadImages();
     }
 
-    private void uploadImages(){
+    private void uploadImages() {
         if (imageList.size() <= 0) {
             Toast.makeText(this, "Choose image first", Toast.LENGTH_SHORT).show();
             return;
@@ -196,6 +363,8 @@ public class LocationPhotoActivity extends AppCompatActivity {
         RequestBody xWorkingBy = RequestBody.create(MediaType.parse("text/plain"), workingBy);
         RequestBody xLat = RequestBody.create(MediaType.parse("text/plain"), "" + lat);
         RequestBody xLon = RequestBody.create(MediaType.parse("text/plain"), "" + lon);
+        System.out.println("Mayur: lat: " + lat);
+        System.out.println("Mayur: lon: " + lon);
         Call<ResponseMessage> call = submissionService.uploadImage(body, name,
                 xCaseID, xCaseDetailsId,
                 xDocFor, xWorkingBy, xLat, xLon);

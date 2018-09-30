@@ -18,10 +18,12 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
 
     private Context context;
     private List<Optionssection> list;
+    private OnRadioClick onRadioClick;
 
-    public RadioAdapter(Context context, List<Optionssection> list) {
+    public RadioAdapter(Context context, List<Optionssection> list, OnRadioClick onRadioClick) {
         this.context = context;
         this.list = list;
+        this.onRadioClick = onRadioClick;
     }
 
     @NonNull
@@ -41,7 +43,9 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
                 boolean isSelected = ((CompoundButton)v).isChecked();
                 if (isSelected) {
                     check(position);
-//                    notifyDataSetChanged();
+                    notifyDataSetChanged();
+                    holder.btn_radio.clearFocus();
+                    onRadioClick.onItemChange(position);
                 }
             }
         });
@@ -69,5 +73,9 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
             super(itemView);
             btn_radio = itemView.findViewById(R.id.btn_radio);
         }
+    }
+
+    public interface OnRadioClick{
+        void onItemChange(int pos);
     }
 }

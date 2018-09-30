@@ -38,7 +38,13 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.txt_sub_sec_heading.setText(list.get(position).getSubSection());
 
-        RadioAdapter adapter = new RadioAdapter(context,list.get(position).getOptionssection());
+        RadioAdapter adapter = new RadioAdapter(context, list.get(position).getOptionssection(),
+                new RadioAdapter.OnRadioClick() {
+                    @Override
+                    public void onItemChange(int pos) {
+                        holder.sub_section_remarks.requestFocus();
+                    }
+                });
         holder.sub_sec_outer_list.setLayoutManager(new LinearLayoutManager(context));
         holder.sub_sec_outer_list.setNestedScrollingEnabled(false);
         holder.sub_sec_outer_list.setAdapter(adapter);
@@ -53,7 +59,6 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
             @Override
             public void afterTextChanged(Editable s) {
                 list.get(position).setBuilder(s.toString());
-
             }
         });
     }
