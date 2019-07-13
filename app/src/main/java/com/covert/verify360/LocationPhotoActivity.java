@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,12 +24,15 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MyAdapter;
 import com.covert.verify360.BeanClasses.ResponseMessage;
+import com.covert.verify360.Helpers.InfoAlertDialogue;
+import com.covert.verify360.Helpers.InfoAlertDialogueWithBtn;
+import com.covert.verify360.Helpers.OnAlertBtnClick;
+import com.covert.verify360.Helpers.ProcessAlertDialogue;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -49,7 +51,6 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,7 +89,7 @@ public class LocationPhotoActivity extends AppCompatActivity {
     private CustomProgressDialogTwo progressDialog;
 
     private static final int REQUEST_CAPTURE_IMAGE = 100;
-    private String imageFilePath;
+    public static String imageFilePath;
 
     private MyAdapter imageAdapter;
     private ArrayList<String> imageList;
@@ -137,11 +138,10 @@ public class LocationPhotoActivity extends AppCompatActivity {
                 try {
                     photoFile = createImageFile();
                 } catch (IOException ex) {
-                    // Error occurred while creating the File
+                    ex.printStackTrace();
                 }
                 if (photoFile != null) {
-                    Uri photoURI = FileProvider.getUriForFile(this,
-                            "com.covert.verify360.provider", photoFile);
+                    Uri photoURI = Uri.fromFile(photoFile);
                     pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                             photoURI);
                     startActivityForResult(pictureIntent,
@@ -211,9 +211,6 @@ public class LocationPhotoActivity extends AppCompatActivity {
                 if (mCurrentLocation != null){
                     lat = mCurrentLocation.getLatitude();
                     lon = mCurrentLocation.getLongitude();
-                    System.out.println("Mayur: mLat: "+lat);
-                    System.out.println("Mayur: mLon: "+lon);
-                    Toast.makeText(LocationPhotoActivity.this, "Location fetched", Toast.LENGTH_SHORT).show();
                     uploadImages();
                     stopLocationUpdates();
                 }
@@ -246,7 +243,6 @@ public class LocationPhotoActivity extends AppCompatActivity {
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
 //                        Log.i(TAG, "All location settings are satisfied.");
                         dismissDialog();
-                        Toast.makeText(getApplicationContext(), "Started location updates!", Toast.LENGTH_SHORT).show();
 
                         //noinspection MissingPermission
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
@@ -315,14 +311,10 @@ public class LocationPhotoActivity extends AppCompatActivity {
         String timeStamp =
                 new SimpleDateFormat("yyyyMMdd_HHmmss",
                         Locale.getDefault()).format(new Date());
-        String imageFileName = "IMG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        imageFilePath = image.getAbsolutePath();
+        String imageFileName = "IMG_" + timeStamp + ".jpg";
+        String storageDir = Environment.getExternalStorageDirectory()+"/Verify360/";
+        File image = new File(storageDir+imageFileName);
+        imageFilePath = storageDir+imageFileName;
         return image;
     }
 
@@ -331,14 +323,11 @@ public class LocationPhotoActivity extends AppCompatActivity {
         if (checkLocPermission()){
             initLocation();
         }
-
-        // TODO: 9/29/2018 Get location here and once you get location, set lat-lon in lat, lon variables
-        // and then call uploadImages();
     }
 
     private void uploadImages() {
         if (imageList.size() <= 0) {
-            Toast.makeText(this, "Choose image first", Toast.LENGTH_SHORT).show();
+            new InfoAlertDialogue(LocationPhotoActivity.this).ShowDialogue("Error", "Please select atleast one image.");
             return;
         }
 
@@ -348,35 +337,44 @@ public class LocationPhotoActivity extends AppCompatActivity {
     }
 
     private void uploadImage(File file, String docFor, double lat, double lon) {
-        showProgressDialog();
+        ProcessAlertDialogue dialogue= new ProcessAlertDialogue(this);
+        dialogue.ShowDialogue();
         RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
+        /*MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
                 file.getName(),
-                reqFile);
-
-        UploadImage submissionService = FactoryService.createFileService(UploadImage.class);
-
-        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+                reqFile);*/
+        RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), file);
+        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("document_path", file.getName(), requestBody);
         RequestBody xCaseID = RequestBody.create(MediaType.parse("text/plain"), caseId);
         RequestBody xCaseDetailsId = RequestBody.create(MediaType.parse("text/plain"), caseDetailId);
         RequestBody xDocFor = RequestBody.create(MediaType.parse("text/plain"), docFor);
         RequestBody xWorkingBy = RequestBody.create(MediaType.parse("text/plain"), workingBy);
         RequestBody xLat = RequestBody.create(MediaType.parse("text/plain"), "" + lat);
         RequestBody xLon = RequestBody.create(MediaType.parse("text/plain"), "" + lon);
-        System.out.println("Mayur: lat: " + lat);
-        System.out.println("Mayur: lon: " + lon);
-        Call<ResponseMessage> call = submissionService.uploadImage(body, name,
-                xCaseID, xCaseDetailsId,
+
+        UploadImage submissionService = FactoryService.createFileService(UploadImage.class);
+
+
+
+        //RequestBody docPath = RequestBody.create(MediaType.parse("text/plain"), file.getName());
+
+        Call<ResponseMessage> call = submissionService.uploadImage(fileToUpload,xCaseID, xCaseDetailsId,
                 xDocFor, xWorkingBy, xLat, xLon);
+        System.out.println("Sending Image Call");
         call.enqueue(new Callback<ResponseMessage>() {
             @Override
             public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                System.out.println("Receiving Image Call");
+                System.out.println(response.message());
                 if (response.isSuccessful()) {
                     if (!response.body().isError()) {
-                        dismissDialog();
-                        Toast.makeText(LocationPhotoActivity.this,
-                                "Form details submitted", Toast.LENGTH_SHORT).show();
-                        finish();
+                        dialogue.CloseDialogue();
+                        new InfoAlertDialogueWithBtn(LocationPhotoActivity.this).ShowDialogue("Information", "Document uploaded.", new OnAlertBtnClick() {
+                            @Override
+                            public void onClick(boolean whichBtn) {
+                                finish();
+                            }
+                        });
                     }
                 }
             }
@@ -384,9 +382,21 @@ public class LocationPhotoActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseMessage> call, Throwable t) {
                 t.printStackTrace();
-                dismissDialog();
-                Toast.makeText(LocationPhotoActivity.this,
-                        "We found some glitch", Toast.LENGTH_SHORT).show();
+                System.out.println("Image error" + t.getMessage());
+                dialogue.CloseDialogue();
+                try{
+                    Thread.sleep(2000);
+                }catch (Exception e){}
+                if(t.getMessage().contains("Use JsonReader.setLenient(true)")){
+                    new InfoAlertDialogueWithBtn(LocationPhotoActivity.this).ShowDialogue("Information", "Document uploaded.", new OnAlertBtnClick() {
+                        @Override
+                        public void onClick(boolean whichBtn) {
+                            finish();
+                        }
+                    });
+                }else{
+                    new InfoAlertDialogue(LocationPhotoActivity.this).ShowDialogue("Error", "Unable to upload data.");
+                }
             }
         });
     }
@@ -397,6 +407,7 @@ public class LocationPhotoActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 //                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
                 imageList.add(imageFilePath);
+                System.out.println("Image Path: "+imageFilePath);
                 imageAdapter.notifyDataSetChanged();
                 imageFilePath = "";
             } else {

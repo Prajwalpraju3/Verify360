@@ -5,5 +5,6 @@
     android:layout_gravity="center"
     android:indeterminate="true"
     android:progress="25"
+    android:visibility="gone"
     android:indeterminateTint="@color/colorPrimary"
     xmlns:android="http://schemas.android.com/apk/res/android" />

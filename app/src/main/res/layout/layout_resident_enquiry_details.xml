@@ -42,6 +42,7 @@
                 android:id="@+id/rMet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Met" />
         </android.support.design.widget.TextInputLayout>
 
@@ -58,6 +59,7 @@
                 android:id="@+id/rRel_with_applicant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Relationship with Applicant" />
         </android.support.design.widget.TextInputLayout>
 
@@ -74,6 +76,7 @@
                 android:id="@+id/rOwned_Rented"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Owned/Rented" />
         </android.support.design.widget.TextInputLayout>
 
@@ -90,6 +93,7 @@
                 android:id="@+id/rYear_of_stay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Years of stay at current residence" />
         </android.support.design.widget.TextInputLayout>
 
@@ -106,6 +110,7 @@
                 android:id="@+id/rNo_of_family_members"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Number of family members" />
         </android.support.design.widget.TextInputLayout>
 
@@ -122,6 +127,7 @@
                 android:id="@+id/rNo_of_working"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Number of Working" />
         </android.support.design.widget.TextInputLayout>
 
@@ -198,6 +204,7 @@
                 android:id="@+id/rDesignation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Designation" />
         </android.support.design.widget.TextInputLayout>
 
@@ -213,6 +220,7 @@
                 android:id="@+id/rYear_of_exp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Year of experience" />
         </android.support.design.widget.TextInputLayout>
 

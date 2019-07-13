@@ -2,15 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="150dp"
-    android:gravity="center"
+    android:gravity="bottom"
     android:background="#0D6292"
-    android:orientation="vertical">
-<TextView
-    android:id="@+id/textHeader"
-    android:text="Header"
-    android:textColor="@android:color/white"
-    android:typeface="monospace"
-    android:textSize="20sp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    android:orientation="horizontal">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/profilepic_imageview"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="15dp"
+        android:layout_weight="0.5"
+        android:src="@mipmap/ic_launcher"/>
+    <TextView
+        android:id="@+id/textHeader"
+        android:text="Header"
+        android:textColor="@android:color/white"
+        android:layout_weight="0.5"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="15dp"
+        android:typeface="monospace"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>

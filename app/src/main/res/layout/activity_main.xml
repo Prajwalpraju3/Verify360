@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+
     tools:context="com.covert.verify360.MainActivity"
     tools:openDrawer="start">
 
@@ -36,15 +37,40 @@
 
 
     </LinearLayout>
+
+
     <android.support.design.widget.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:itemTextAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-        app:menu="@menu/drawer_menu_items" />
-
-
+        app:itemTextAppearance="@style/Base.TextAppearance.AppCompat.Small"
+        app:menu="@menu/drawer_menu_items"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:clickable="true"
+            android:orientation="vertical">
+            <!--<TextView
+                android:id="@+id/version"
+                android:text="Version: "
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:textColor="@color/edittext_textcolor" />-->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15px"
+                    android:id="@+id/logout_imageview"
+                    android:tint="@color/colorPrimary"
+                    android:src="@drawable/ic_lock_outline_black_24dp"
+                    android:background="@color/edittext_textcolor"/>
+        </LinearLayout>
+    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
 

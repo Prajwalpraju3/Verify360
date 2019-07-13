@@ -8,19 +8,6 @@
     android:orientation="vertical"
     tools:context="com.covert.verify360.Fragments.NewCasesFragment">
     <include layout="@layout/progress_bar_layout"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/round_rect"
-        android:gravity="center"
-        android:text="NEW CASES"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"

@@ -62,7 +62,6 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 notifyDataSetChanged();
             }
         });
-        System.out.println("Mayur: path " + position + " " + list.get(position));
         Glide.with(context).load(list.get(position)).into(((Holder) holder).iv);
     }
 

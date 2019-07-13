@@ -6,8 +6,11 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 @Entity(tableName = "pending_cases",primaryKeys = {"CASE_ID","case_detail_id"})
-public class PendingCasesBean {
+public class PendingCasesBean implements Serializable{
     @SerializedName("CASE_ID")
     @Expose
     @ColumnInfo(name="CASE_ID")

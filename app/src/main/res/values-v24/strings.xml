@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Verify360</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="logo_verify_360">Logo_Verify 360</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="label_address">Address : </string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+    <string name="label_remme">Remember me </string>
+    <string name="label_caseid">Case ID :  </string>
+    <string name="label_activityid">Activity ID : </string>
+    <string name="label_activitytype">Activity Type : </string>
+    <string name="label_cased_detid">Case detailed ID : </string>
+    <string name="label_prepost">Pre_Post : </string>
+    <string name="label_phnum">Phone No : </string>
+    <string name="label_custname">Customer Number : </string>
+    <string name="label_activity">Activity ID : </string>
+    <string name="label_viewmore">View more </string>
+    <string name="label_applicantname">Applicant Name : </string>
+    <string name="label_fathername">Father Name : </string>
+    <string name="label_reasontocancel">Remarks  </string>
+
+</resources>

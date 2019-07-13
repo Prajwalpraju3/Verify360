@@ -359,6 +359,7 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         if (!response.body().isError()) {
                             Toast.makeText(CaseBusinessVerificationActivity.this, "Succesfull", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     }
                 }

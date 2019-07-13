@@ -12,6 +12,8 @@ public interface Login {
     @POST("login_user")
     Call<LoginResponse> login(
             @Field("user_login_id") String username,
-            @Field("password") String Password
+            @Field("password") String Password,
+            @Field("latitude") Double lat,
+            @Field("longitude") Double lon
     );
 }

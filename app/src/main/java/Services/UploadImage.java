@@ -16,13 +16,12 @@ import retrofit2.http.PartMap;
 
 public interface UploadImage {
     @Multipart
-    @POST("api/Upload/user/PostUserImage")
+    @POST("Upload/user/PostUserImage")
     Call<ResponseMessage> uploadImage(@Part MultipartBody.Part image,
-                                      @Part ("name") RequestBody name,
-                                      @Part("case_id")RequestBody case_id,
-                                      @Part("case_detailed_id")RequestBody case_detailed_id,
+                                      @Part("case_id") RequestBody case_id,
+                                      @Part("case_detailed_id") RequestBody case_detailed_id,
                                       @Part("document_for") RequestBody docFor,
-                                      @Part("inserted_by")RequestBody working_by,
-                                      @Part("latitude")RequestBody lat,
-                                      @Part("longitude")RequestBody lon);
+                                      @Part("inserted_by") RequestBody working_by,
+                                      @Part("latitude") RequestBody lat,
+                                      @Part("longitude") RequestBody lon);
 }

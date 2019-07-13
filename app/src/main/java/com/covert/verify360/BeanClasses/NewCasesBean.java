@@ -7,11 +7,13 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by user on 3/28/2018.
  */
 @Entity(tableName = "new_cases", primaryKeys = {"CASE_ID", "case_detail_id"})
-public class NewCasesBean {
+public class NewCasesBean implements Serializable {
     @SerializedName("CASE_ID")
     @Expose
     @ColumnInfo(name = "CASE_ID")

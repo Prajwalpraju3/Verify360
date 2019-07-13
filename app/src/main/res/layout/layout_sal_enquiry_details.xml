@@ -41,6 +41,7 @@
                 android:id="@+id/sMet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Met" />
         </android.support.design.widget.TextInputLayout>
 
@@ -57,6 +58,7 @@
                 android:id="@+id/sDesignation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Designation" />
         </android.support.design.widget.TextInputLayout>
 
@@ -73,6 +75,7 @@
                 android:id="@+id/sApplicantDesignation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Applicant Designation" />
         </android.support.design.widget.TextInputLayout>
 
@@ -89,6 +92,7 @@
                 android:id="@+id/sEmployeeSince"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Employee Since" />
         </android.support.design.widget.TextInputLayout>
 
@@ -105,6 +109,7 @@
                 android:id="@+id/sNatureOFBusiness"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Nature of Business" />
         </android.support.design.widget.TextInputLayout>
 
@@ -156,6 +161,7 @@
                 android:id="@+id/striggerExplaination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:hint="Explaination" />
         </android.support.design.widget.TextInputLayout>
 

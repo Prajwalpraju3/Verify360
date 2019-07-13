@@ -3,10 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="#FFFFFF"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
+        android:textAlignment="center"
         android:id="@+id/textView2"
         style="@style/textHeading"
         android:layout_width="match_parent"
@@ -17,82 +19,126 @@
         android:text="Case Details"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:textSize="16sp"
-        android:id="@+id/case_id"
-        android:layout_width="0dp"
+    <TableLayout
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="10001"
+        android:shrinkColumns="*"
+        android:stretchColumns="*"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-    <TextView
-        android:id="@+id/activity_id"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="2002"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/case_id"
-        app:layout_constraintStart_toStartOf="@+id/case_id"
-        app:layout_constraintTop_toBottomOf="@+id/case_id" />
-
-    <TextView
-        android:id="@+id/client"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="HDFC"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/activity_id"
-        app:layout_constraintStart_toStartOf="@+id/activity_id"
-        app:layout_constraintTop_toBottomOf="@+id/activity_id" />
-
-    <TextView
-        android:id="@+id/pre_post"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="PRE_POST"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/client"
-        app:layout_constraintStart_toStartOf="@+id/client"
-        app:layout_constraintTop_toBottomOf="@+id/client" />
-
-    <TextView
-        android:id="@+id/product_type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="HL"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/pre_post"
-        app:layout_constraintStart_toStartOf="@+id/pre_post"
-        app:layout_constraintTop_toBottomOf="@+id/pre_post" />
-
-    <TextView
-        android:id="@+id/activity_type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Residential Verification"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/product_type"
-        app:layout_constraintStart_toStartOf="@+id/product_type"
-        app:layout_constraintTop_toBottomOf="@+id/product_type" />
-
-    <TextView
-        android:id="@+id/company_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="INFOSYS"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/activity_type"
-        app:layout_constraintStart_toStartOf="@+id/activity_type"
-        app:layout_constraintTop_toBottomOf="@+id/activity_type" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:textSize="14sp"
+                android:id="@+id/caseid_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:text="@string/label_caseid"
+                />
+            <TextView
+                android:textSize="16sp"
+                android:id="@+id/case_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"
+                android:text="10001"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:textSize="14sp"
+                android:id="@+id/activityid_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_activityid"
+                />
+            <TextView
+                android:textSize="16sp"
+                android:id="@+id/activity_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10001"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:textSize="14sp"
+                android:id="@+id/prepost_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_prepost"
+                />
+            <TextView
+                android:textSize="16sp"
+                android:id="@+id/pre_post"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10001"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Client"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/client"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="HDFC"
+                android:textSize="16sp"/>
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Product Type"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/product_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="HDFC"
+                android:textSize="16sp"/>
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Type"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/activity_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Residential Verification"
+                android:textSize="16sp"/>
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="wrap_content"
+                android:text="Company"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/company_name"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:text="INFOSYS"
+                android:textSize="16sp"/>
+        </TableRow>
+    </TableLayout>
 </android.support.constraint.ConstraintLayout>

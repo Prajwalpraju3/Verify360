@@ -547,6 +547,7 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         if (!response.body().isError()) {
                             Toast.makeText(CaseResidentVerificationActivity.this, "Succesfull", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     }
                 }

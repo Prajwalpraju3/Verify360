@@ -4,9 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:background="#FFFFFF"
+    android:layout_height="match_parent">
     <TextView
         android:id="@+id/textView2"
+        android:textAlignment="center"
         style="@style/textHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,62 +16,93 @@
         android:paddingEnd="10dp"
         android:paddingStart="10dp"
         android:text="Applicant Details"
-       />
+        />
 
-    <TextView
-        android:id="@+id/applicant_name"
-        android:layout_width="0dp"
+    <TableLayout
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Dhanraj"
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:id="@+id/applicantlabel_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_applicantname"
+                android:textSize="14sp"
+                />
+            <TextView
+                android:id="@+id/applicant_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dhanraj"
+                android:textSize="16sp"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:id="@+id/fathername_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_fathername"
+                android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/father_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Wamanrao"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/applicant_name"
-        app:layout_constraintStart_toStartOf="@+id/applicant_name"
-        app:layout_constraintTop_toBottomOf="@+id/applicant_name" />
-
-    <TextView
-        android:id="@+id/mobile_number"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="735322656"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/father_name"
-        app:layout_constraintStart_toStartOf="@+id/father_name"
-        app:layout_constraintTop_toBottomOf="@+id/father_name" />
-
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Dhanraj@gmail.com"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/mobile_number"
-        app:layout_constraintStart_toStartOf="@+id/mobile_number"
-        app:layout_constraintTop_toBottomOf="@+id/mobile_number" />
-
-    <TextView
-        android:id="@+id/address"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="bvhgchjgchgbc"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/email"
-        app:layout_constraintStart_toStartOf="@+id/email"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+            <TextView
+                android:id="@+id/father_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Wamanrao"
+                android:textSize="16sp" />
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Contact"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/mobile_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="735322656"
+                android:textSize="16sp"/>
+        </TableRow>
+        <TableRow
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="16sp"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_weight="0.4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textSize="16sp"/>
+            <TextView
+                android:layout_weight="0.6"
+                android:id="@+id/address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textSize="16sp"/>
+        </TableRow>
+    </TableLayout>
 </android.support.constraint.ConstraintLayout>

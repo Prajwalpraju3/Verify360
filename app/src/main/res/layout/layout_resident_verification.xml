@@ -98,16 +98,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/enquirydetailslayout" />
 
-            <include
-                android:id="@+id/finalstatuslayout"
-                layout="@layout/layout_final_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/neighbourlayout" />
-
             <Button
                 android:id="@+id/add_image"
                 android:layout_width="wrap_content"
@@ -116,7 +106,19 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/finalstatuslayout" />
+                app:layout_constraintTop_toBottomOf="@+id/neighbourlayout"  />
+
+
+            <include
+                android:id="@+id/finalstatuslayout"
+                layout="@layout/layout_final_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/add_image" />
+
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

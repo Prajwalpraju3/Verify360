@@ -1,38 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ndroid="http://schemas.android.com/apk/res-auto">
 
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/dashboard"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="Dashboard" />
+
         <item
             android:id="@+id/newCasesFragment"
+            android:icon="@drawable/ic_add_to_queue_black_24dp"
             android:title="New Cases" />
         <item
             android:id="@+id/pendingCasesFragment"
+            android:icon="@drawable/ic_event_note_black_24dp"
             android:title="Pending Cases" />
         <item
             android:id="@+id/completedCasesFragment"
+            android:icon="@drawable/ic_event_available_black_24dp"
             android:title="Completed Cases" />
         <item
             android:id="@+id/cancelledCasesFragment"
+            android:icon="@drawable/ic_event_busy_black_24dp"
             android:title="Cancelled Cases" />
         <item
-            android:id="@+id/reAssignedCasesFragment"
-            android:title="Re-Assigned Cases" />
-        <item
             android:id="@+id/reOpenedCasesFragment"
+            android:icon="@drawable/ic_screen_share_black_24dp"
             android:title="Re-Opened Cases" />
         <item
             android:id="@+id/reportsFragment"
+            android:icon="@drawable/ic_insert_chart_black_24dp"
             android:title="Reports" />
         <item
             android:id="@+id/earningsFragment"
+            android:icon="@drawable/ic_attach_money_black_24dp"
             android:title="Earnings" />
         <item
             android:id="@+id/profileSettingsFragment"
+            android:icon="@drawable/ic_settings_applications_black_24dp"
             android:title="Settings" />
 
         <item
-            android:id="@+id/logout"
-            android:title="Logout" />
+            android:id="@+id/dummyItem"
+            android:title="" />
     </group>
 
 </menu>

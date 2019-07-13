@@ -3,6 +3,7 @@ package com.covert.verify360.Fragments;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -11,10 +12,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +32,8 @@ import android.widget.Toast;
 import com.covert.verify360.BeanClasses.AssignedCasesResponse;
 import com.covert.verify360.BeanClasses.NewCasesBean;
 import com.covert.verify360.GlobalConstants;
+import com.covert.verify360.Helpers.InfoAlertDialogue;
+import com.covert.verify360.Helpers.ProcessAlertDialogue;
 import com.covert.verify360.MainActivity;
 import com.covert.verify360.R;
 
@@ -58,12 +65,18 @@ import retrofit2.Response;
 
 
 public class NewCasesFragment extends Fragment {
-    private ViewPager viewPager;
-    private NewCasesAdapter newCasesAdapter;
     private List<NewCasesBean> list;
     private SharedPreferences sharedPreferences;
-    private ProgressBar progressBar;
     private DatabaseHandler db_instance;
+    private ProcessAlertDialogue processAlertDialogue;
+    View v;
+
+
+    NewCasesBean newCasesBean;
+    TextView case_id, activity_id, client, pre_post, product_type, activity_type, company_name,
+            applicant_name, father_name, mobile_number, email, address, est_complete_date, remarks;
+    Button buttonDownload, buttonAccept, buttonReject, viewButton;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,40 +89,214 @@ public class NewCasesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_new_cases, container, false);
+        v = inflater.inflate(R.layout.new_cases_row, container, false);
         sharedPreferences = getActivity().getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
-        progressBar = v.findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
-        viewPager = v.findViewById(R.id.viewPager);
-        viewPager.setVisibility(View.VISIBLE);
-
-        String empid = null;
-        if (sharedPreferences != null && sharedPreferences.contains("EMP_ID")) {
-            empid = sharedPreferences.getString("EMP_ID", "");
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Case Details");
+        try {
+            Bundle bundle= getArguments();
+            newCasesBean = (NewCasesBean) bundle.getSerializable("xyz");
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        setData(empid);
+        case_id = v.findViewById(R.id.case_id);
+        activity_id = v.findViewById(R.id.activity_id);
+        client = v.findViewById(R.id.client);
+        pre_post = v.findViewById(R.id.pre_post);
+        product_type = v.findViewById(R.id.product_type);
+        activity_type = v.findViewById(R.id.activity_type);
+        company_name = v.findViewById(R.id.company_name);
+        applicant_name = v.findViewById(R.id.applicant_name);
+        father_name = v.findViewById(R.id.father_name);
+        mobile_number = v.findViewById(R.id.mobile_number);
+        email = v.findViewById(R.id.email);
+        address = v.findViewById(R.id.address);
+        est_complete_date = v.findViewById(R.id.est_complete_date);
+        remarks = v.findViewById(R.id.remarks);
 
-        db_instance.newCasesDao().getCasesFromDB().observe(this, (List<NewCasesBean> newcases) -> {
-            newCasesAdapter = new NewCasesAdapter(getActivity(), newcases);
-            viewPager.setAdapter(newCasesAdapter);
+        buttonAccept = v.findViewById(R.id.acceptButton);
+        buttonReject = v.findViewById(R.id.rejectButton);
+        buttonDownload = v.findViewById(R.id.downloadButton);
+        viewButton = v.findViewById(R.id.viewButton);
+
+        case_id.setText(newCasesBean.getCase_id());
+        activity_id.setText(newCasesBean.getCase_detail_id());
+        client.setText(newCasesBean.getClient_name());
+        pre_post.setText(newCasesBean.getPre_post());
+        product_type.setText(newCasesBean.getProduct_type());
+        activity_type.setText(newCasesBean.getActivity_type());
+        company_name.setText(newCasesBean.getCompany_name());
+        applicant_name.setText(newCasesBean.getApplicant_first_name()
+                + " " + newCasesBean.getApplicant_last_name());
+        father_name.setText(newCasesBean.getFather_name());
+        mobile_number.setText(newCasesBean.getPrimary_contact());
+        email.setText(newCasesBean.getEmail());
+        address.setText(newCasesBean.getDoor_number() + ", "
+                + newCasesBean.getStreet_address() + ", "
+                + newCasesBean.getLandmark() + "\n"
+                + newCasesBean.getLocation() + ", "
+                + newCasesBean.getPincode() + "\n" + newCasesBean.getRegion_name());
+        est_complete_date.setText(newCasesBean.getEst_completed_date());
+        remarks.setText(newCasesBean.getRemarks());
+
+
+        buttonReject.setOnClickListener(view -> {
+            if(!MainActivity.isIsConnected()){
+                Snackbar.make(getView(), "No internet connection!", 2000).show();
+                return;
+
+            }
+            String working_by = null;
+            if (sharedPreferences != null && sharedPreferences.contains("EMP_ID")) {
+                working_by = sharedPreferences.getString("EMP_ID", "");
+            }
+            RejectService rejectService = FactoryService.createService(RejectService.class);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            View viewAlert = LayoutInflater.from(getActivity()).inflate(R.layout.layout_alert_dialog, null);
+            final TextInputEditText reasonEtext = viewAlert.findViewById(R.id.reasonToReject);
+            String finalWorking_by = working_by;
+            builder.setView(viewAlert)
+                    .setTitle("Verify360")
+                    .setPositiveButton("Reject", (dialog, which) -> {
+                        Call<ResponseBody> call = rejectService.reject(finalWorking_by, newCasesBean.getCase_detail_id()
+                                , newCasesBean.getCase_id(), reasonEtext.getText().toString()
+                                , Integer.toString(GlobalConstants.REJECT));
+                        call.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.isSuccessful()) {
+                                    AsyncTask.execute(() -> db_instance.newCasesDao().deleteAllCases());
+                                    setData(finalWorking_by);
+                                    dialog.cancel();
+                                    new InfoAlertDialogue(getActivity()).ShowDialogue(getString(R.string.information), "Case is rejected.");
+                                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                    fragmentManager.beginTransaction().replace(R.id.container_fragment, new  ModifiedNewCasesFragment()).addToBackStack(null).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
+                                } else {
+                                    dialog.cancel();
+                                    new InfoAlertDialogue(getActivity()).ShowDialogue(getString(R.string.information), getString(R.string.unable_to_process));
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Snackbar.make(getView(), "Server error!", 2000).show();
+                                dialog.cancel();
+                            }
+                        });
+                    }).setNegativeButton("Cancel", (dialog, which) -> {
+                dialog.cancel();
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
+
+
+        buttonAccept.setOnClickListener(view -> {
+            if(!MainActivity.isIsConnected()){
+                Snackbar.make(getView(), "No internet connection!", 2000).show();
+                return;
+
+            }
+            android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(getActivity(),  R.style.AlertDialogTheme);
+            dialog.setCancelable(false);
+            dialog.setTitle("Confirmation");
+            dialog.setMessage("Are you sure about accepting case?");
+            dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            dialog.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    String working_by = null;
+                    if (sharedPreferences != null && sharedPreferences.contains("EMP_ID")) {
+                        working_by = sharedPreferences.getString("EMP_ID", "");
+                    }
+                    AcceptService acceptService = FactoryService.createService(AcceptService.class);
+                    Call<ResponseBody> call = acceptService.accept(working_by, newCasesBean.getCase_detail_id()
+                            , newCasesBean.getCase_id(), Integer.toString(GlobalConstants.ACCEPT));
+                    String finalWorking_by = working_by;
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+                                AsyncTask.execute(() -> db_instance.newCasesDao().deleteAllCases());
+                                setData(finalWorking_by);
+                                new InfoAlertDialogue(getActivity()).ShowDialogue(getString(R.string.information), "Case Accepted.");
+                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction().replace(R.id.container_fragment, new  ModifiedNewCasesFragment()).addToBackStack(null).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
+                            } else {
+                                new InfoAlertDialogue(getActivity()).ShowDialogue(getString(R.string.information), getString(R.string.unable_to_process));
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Snackbar.make(getView(), "Server error!", 2000).show();
+                        }
+                    });
+                }
+            });
+            final android.support.v7.app.AlertDialog alert = dialog.create();
+            alert.show();
+        });
+
+        buttonDownload.setOnClickListener(view -> {
+            if(null == newCasesBean.getFile_url() || newCasesBean.getFile_url().trim().equals("")){
+                Snackbar.make(getView(),"File not available!", 2000).show();
+                return;
+            }
+            String fileUrl = newCasesBean.getFile_url();
+            String fileName = newCasesBean.getFile_url().substring(newCasesBean.getFile_url().lastIndexOf("_") + 1);
+            DownloadTask downloadTask = new DownloadTask(fileUrl, fileName);
+            if(!MainActivity.isIsConnected()){
+                Snackbar.make(getView(), "No internet connection!", 2000).show();
+                return;
+
+            }
+            downloadTask.execute();
+        });
+        viewButton.setOnClickListener(view -> {
+            if(null == newCasesBean.getFile_url() || newCasesBean.getFile_url().trim().equals("")){
+                Snackbar.make(getView(),"File not available!", 2000).show();
+                return;
+            }
+            String fileName = newCasesBean.getFile_url().substring(newCasesBean.getFile_url().lastIndexOf("_") + 1);
+            File file = new File(Environment.getExternalStorageDirectory() + "/Verify360/" + fileName);
+            if (file.exists()) {
+                Uri uri = Uri.fromFile(file);
+                Intent pdfOpenintent = new Intent(Intent.ACTION_VIEW);
+                pdfOpenintent.setDataAndType(uri, "application/pdf");
+                try {
+                    startActivityForResult(pdfOpenintent,0);
+                }
+                catch (ActivityNotFoundException e) {
+                    Snackbar.make(getView(), "PDF viewer not found!", 2000).show();
+                }
+            } else {
+                Snackbar.make(getView(), "Please download file first!", 2000).show();
+            }
+        });
+
         return v;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("New Case Details");
     }
 
     private void setData(String empid) {
         if(!MainActivity.isIsConnected()){
-            Toast.makeText(getActivity(), "Please connect to internet.", Toast.LENGTH_SHORT).show();
+            Snackbar.make(getView(), "No internet connection!", 2000).show();
             return;
         }
         if (list != null) {
             list.clear();
         }
-        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setVisibility(View.VISIBLE);
         IAssignedCases iAssignedCases = FactoryService.createService(IAssignedCases.class);
         iAssignedCases.getCasesFromNetwork(empid)
                 .subscribeOn(Schedulers.io())
@@ -123,23 +310,23 @@ public class NewCasesFragment extends Fragment {
                     @Override
                     public void onNext(final AssignedCasesResponse assignedCasesResponse) {
                         if (assignedCasesResponse.getError().equals("false")) {
-                            progressBar.setVisibility(View.GONE);
+                            //progressBar.setVisibility(View.GONE);
                             AsyncTask.execute(() -> db_instance.newCasesDao().insertCases(assignedCasesResponse.getNewCasesList()));
                         } else {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(getActivity(), "Data not found", Toast.LENGTH_SHORT).show();
+                            //progressBar.setVisibility(View.GONE);
+                            Snackbar.make(getView(), "Data not available!", 2000).show();
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(), "Server Error" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        //progressBar.setVisibility(View.GONE);
+                        Snackbar.make(getView(), "Server Error" + e.getMessage(), 2000).show();
                     }
 
                     @Override
                     public void onComplete() {
-                        progressBar.setVisibility(View.GONE);
+                        //progressBar.setVisibility(View.GONE);
                     }
 
                 });
@@ -180,8 +367,8 @@ public class NewCasesFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(getActivity(), "Downlaoding file", Toast.LENGTH_SHORT).show();
-            progressBar.setVisibility(View.VISIBLE);
+            Snackbar.make(getView(), "starting Download!", 2000).show();
+            //progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -205,7 +392,7 @@ public class NewCasesFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Toast.makeText(getActivity(), "Error in downlaoding file", Toast.LENGTH_SHORT).show());
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Snackbar.make(getView(), "Download error!", 2000).show());
                 }
             });
 
@@ -227,7 +414,7 @@ public class NewCasesFragment extends Fragment {
                     inputStream = response.byteStream();
                     File filename = new File(dir, fileName);
                     if (filename.exists()) {
-                        Objects.requireNonNull(getActivity()).runOnUiThread(() -> Toast.makeText(getActivity(), "File already present", Toast.LENGTH_SHORT).show());
+                        Objects.requireNonNull(getActivity()).runOnUiThread(() -> Snackbar.make(getView(), "Already downloaded!", 2000).show());
                         return;
                     }
                     outputStream = new FileOutputStream(filename);
@@ -241,17 +428,17 @@ public class NewCasesFragment extends Fragment {
 
                     }
                     outputStream.flush();
-                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Toast.makeText(getActivity(), "File Downloaded", Toast.LENGTH_SHORT).show());
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Snackbar.make(getView(), "Download complete!", 2000).show());
 
 
                 } catch (FileNotFoundException e) {
                     Log.d("Status", "" + e.getMessage());
-                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Toast.makeText(getActivity(), "Cannot find file", Toast.LENGTH_SHORT).show());
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Snackbar.make(getView(), "Cannot download file!", 2000).show());
 
 
                 } catch (IOException e) {
                     Log.d("Status", "" + e.getMessage());
-                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Toast.makeText(getActivity(), "Error downloading file", Toast.LENGTH_SHORT).show());
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> Snackbar.make(getView(), "File download error!", 2000).show());
 
                 } finally {
                     if (inputStream != null) {
@@ -270,7 +457,7 @@ public class NewCasesFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressBar.setVisibility(View.GONE);
+            //progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -307,165 +494,9 @@ public class NewCasesFragment extends Fragment {
                     applicant_name, father_name, mobile_number, email, address, est_complete_date, remarks;
             Button buttonDownload, buttonAccept, buttonReject, viewButton;
 
-            case_id = viewGroup.findViewById(R.id.case_id);
-            activity_id = viewGroup.findViewById(R.id.activity_id);
-            client = viewGroup.findViewById(R.id.client);
-            pre_post = viewGroup.findViewById(R.id.pre_post);
-            product_type = viewGroup.findViewById(R.id.product_type);
-            activity_type = viewGroup.findViewById(R.id.activity_type);
-            company_name = viewGroup.findViewById(R.id.company_name);
-            applicant_name = viewGroup.findViewById(R.id.applicant_name);
-            father_name = viewGroup.findViewById(R.id.father_name);
-            mobile_number = viewGroup.findViewById(R.id.mobile_number);
-            email = viewGroup.findViewById(R.id.email);
-            address = viewGroup.findViewById(R.id.address);
-            est_complete_date = viewGroup.findViewById(R.id.est_complete_date);
-            remarks = viewGroup.findViewById(R.id.remarks);
-
-            buttonAccept = viewGroup.findViewById(R.id.acceptButton);
-            buttonReject = viewGroup.findViewById(R.id.rejectButton);
-            buttonDownload = viewGroup.findViewById(R.id.downloadButton);
-            viewButton = viewGroup.findViewById(R.id.viewButton);
-
-            case_id.setText("Case Id :" + " " + listNewCases.get(position).getCase_id());
-            activity_id.setText("Activity Id :" + " " + listNewCases.get(position).getCase_detail_id());
-            client.setText("Client :" + " " + listNewCases.get(position).getClient_name());
-            pre_post.setText("Pre_Post :" + " " + listNewCases.get(position).getPre_post());
-            product_type.setText("Product type :" + " " + listNewCases.get(position).getProduct_type());
-            activity_type.setText("Activity type :" + " " + listNewCases.get(position).getActivity_type());
-            company_name.setText("Company :" + " " + listNewCases.get(position).getCompany_name());
-            applicant_name.setText("Full Name :" + " " + listNewCases.get(position).getApplicant_first_name()
-                    + " " + listNewCases.get(position).getApplicant_last_name());
-            father_name.setText("Father Name :" + " " + listNewCases.get(position).getFather_name());
-            mobile_number.setText("Mobile :" + " " + listNewCases.get(position).getPrimary_contact());
-            email.setText("Email :" + " " + listNewCases.get(position).getEmail());
-            address.setText("Address :" + "\n" + listNewCases.get(position).getDoor_number() + ", "
-                    + listNewCases.get(position).getStreet_address() + ", "
-                    + listNewCases.get(position).getLandmark() + "\n"
-                    + listNewCases.get(position).getLocation() + ", "
-                    + listNewCases.get(position).getPincode() + "\n" + listNewCases.get(position).getRegion_name());
-            est_complete_date.setText("est-compl-date :" + " " + listNewCases.get(position).getEst_completed_date());
-            remarks.setText("Remarks :" + " " + listNewCases.get(position).getRemarks());
-
-
-            buttonReject.setOnClickListener(v -> {
-                if(!MainActivity.isIsConnected()){
-                    Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
-                    return;
-
-                }
-                String working_by = null;
-                if (sharedPreferences != null && sharedPreferences.contains("EMP_ID")) {
-                    working_by = sharedPreferences.getString("EMP_ID", "");
-                }
-                RejectService rejectService = FactoryService.createService(RejectService.class);
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                View view = LayoutInflater.from(context).inflate(R.layout.layout_alert_dialog, null);
-                final TextInputEditText reasonEtext = view.findViewById(R.id.reasonToReject);
-                String finalWorking_by = working_by;
-                builder.setView(view)
-                        .setTitle("Verify360")
-                        .setPositiveButton("Reject", (dialog, which) -> {
-                            Call<ResponseBody> call = rejectService.reject(finalWorking_by, listNewCases.get(position).getCase_detail_id()
-                                    , listNewCases.get(position).getCase_id(), reasonEtext.getText().toString()
-                                    , Integer.toString(GlobalConstants.REJECT));
-                            call.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if (response.isSuccessful()) {
-                                        Toast.makeText(context, "Case Rejected", Toast.LENGTH_SHORT).show();
-                                        AsyncTask.execute(() -> db_instance.newCasesDao().deleteAllCases());
-                                        setData(finalWorking_by);
-                                        dialog.cancel();
-                                    } else {
-                                        Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
-                                        dialog.cancel();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    Toast.makeText(context, "Server Error", Toast.LENGTH_SHORT).show();
-                                    dialog.cancel();
-                                }
-                            });
-                        }).setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.cancel();
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-
-            });
-            buttonAccept.setOnClickListener(v -> {
-                if(!MainActivity.isIsConnected()){
-                    Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
-                    return;
-
-                }
-                String working_by = null;
-                if (sharedPreferences != null && sharedPreferences.contains("EMP_ID")) {
-                    working_by = sharedPreferences.getString("EMP_ID", "");
-                }
-                AcceptService acceptService = FactoryService.createService(AcceptService.class);
-                Call<ResponseBody> call = acceptService.accept(working_by, listNewCases.get(position).getCase_detail_id()
-                        , listNewCases.get(position).getCase_id(), Integer.toString(GlobalConstants.ACCEPT));
-                String finalWorking_by = working_by;
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(context, "Case Accepted successfully", Toast.LENGTH_SHORT).show();
-                            AsyncTask.execute(() -> db_instance.newCasesDao().deleteAllCases());
-                            setData(finalWorking_by);
-                        } else {
-                            Toast.makeText(context, "Error ", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Toast.makeText(context, "Server Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            });
-            buttonDownload.setOnClickListener(v -> {
-                String fileUrl = listNewCases.get(position).getFile_url();
-                String fileName = listNewCases.get(position).getFile_url().substring(listNewCases.get(position).getFile_url().lastIndexOf("_") + 1);
-                DownloadTask downloadTask = new DownloadTask(fileUrl, fileName);
-                if(!MainActivity.isIsConnected()){
-                    Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
-                    return;
-
-                }
-                downloadTask.execute();
-            });
-            viewButton.setOnClickListener(v -> {
-                String fileName = listNewCases.get(position).getFile_url().substring(listNewCases.get(position).getFile_url().lastIndexOf("_") + 1);
-                File file = new File(Environment.getExternalStorageDirectory() + "/Verify360/" + fileName);
-                if (file.exists()) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    String absPath = file.getAbsolutePath();
-                    Uri uri = Uri.parse("content://" + "com.covert.verify360" + "/" + absPath);
-                    intent.setDataAndType(uri, "application/pdf");
-//                    intent.setDataAndType(FileProvider.getUriForFile(context,"com.covert.verify360.fileprovider",file), "application/pdf");
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    Intent choser = Intent.createChooser(intent, "Open File");
-                    try {
-                        context.startActivity(choser);
-                    } catch (ActivityNotFoundException e) {
-                        Toast.makeText(context, "Please download pdf viewer", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show();
-                }
-            });
             container.addView(viewGroup);
             return viewGroup;
         }
     }
+
 }

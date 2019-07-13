@@ -51,14 +51,12 @@ import java.util.List;
 
 public class CameraActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
     private Size previewSize;
     private Size jpegSizes[] = null;
     private TextureView textureView;
@@ -109,11 +107,8 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.camera_layout);
         textureView = findViewById(R.id.textureView);
         textureView.setSurfaceTextureListener(surfaceTextureListener);
-
         imageButtonCapture = findViewById(R.id.captureButton);
         imageButtonCapture.setOnClickListener(v -> captureImage());
-
-
     }
 
     private void captureImage() {
@@ -137,14 +132,11 @@ public class CameraActivity extends AppCompatActivity {
             List<Surface> surfaces = new ArrayList<>(2);
             surfaces.add(imageReader.getSurface());
             surfaces.add(new Surface(textureView.getSurfaceTexture()));
-
             final CaptureRequest.Builder capturebuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             capturebuilder.addTarget(imageReader.getSurface());
             capturebuilder.set(CaptureRequest.JPEG_QUALITY, (byte) 100);
             capturebuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
-
             capturebuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
             ImageReader.OnImageAvailableListener onImageAvailableListener = new ImageReader.OnImageAvailableListener() {
                 @Override
@@ -160,20 +152,16 @@ public class CameraActivity extends AppCompatActivity {
                     } finally {
                         if (image != null)
                             image.close();
-
                     }
                 }
 
                 void save(byte[] bytes) {
                     Bitmap bitmap2;
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
                     bitmap2 = addWatermark(bitmap);
-
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                     byte[] bytes1 = byteArrayOutputStream.toByteArray();
-
                     File file = getImageOutputFile();
                     OutputStream outputStream = null;
                     try {
@@ -327,13 +315,6 @@ public class CameraActivity extends AppCompatActivity {
                     (CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
             cameraManager.openCamera(camId, stateCallback, null);

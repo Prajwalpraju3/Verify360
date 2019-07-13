@@ -5,21 +5,9 @@
     android:orientation="vertical"
     tools:context="com.covert.verify360.Fragments.PendingCasesFragment">
 
-    <include layout="@layout/progress_bar_layout" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/round_rect"
-        android:gravity="center"
-        android:text="PENDING CASES"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+    <include layout="@layout/no_data"
+        android:id="@+id/no_data"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pendingCasesRview"

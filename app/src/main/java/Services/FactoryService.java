@@ -20,7 +20,7 @@ public class FactoryService {
             .baseUrl(BaseUrl.BASE_URL)
             .build();
 
-    private static String mURL = "http://54.165.46.114/apiverify360/";
+    private static String mURL = BaseUrl.BASE_URL;
     private static HttpLoggingInterceptor interceptor2 = new HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY);
     private static OkHttpClient okHttpClient2 = new OkHttpClient.Builder().addInterceptor(interceptor2).build();
