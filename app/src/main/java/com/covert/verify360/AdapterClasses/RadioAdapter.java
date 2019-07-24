@@ -19,11 +19,13 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
     private Context context;
     private List<Optionssection> list;
     private OnRadioClick onRadioClick;
+    String mIs_multiple;
 
-    public RadioAdapter(Context context, List<Optionssection> list, OnRadioClick onRadioClick) {
+    public RadioAdapter(Context context,String is_multiple, List<Optionssection> list, OnRadioClick onRadioClick) {
         this.context = context;
         this.list = list;
         this.onRadioClick = onRadioClick;
+        mIs_multiple = is_multiple;
     }
 
     @NonNull

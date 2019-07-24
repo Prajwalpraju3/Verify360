@@ -32,10 +32,10 @@ public class OuterSubSecAdapter extends RecyclerView.Adapter<OuterSubSecAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.recycler_view.setLayoutManager(new LinearLayoutManager(context));
-        holder.recycler_view.setNestedScrollingEnabled(false);
-        InnerSubSecAdapter adapter = new InnerSubSecAdapter(context, list.get(position).getInnerSubSection());
-        holder.recycler_view.setAdapter(adapter);
+//        holder.recycler_view.setLayoutManager(new LinearLayoutManager(context));
+//        holder.recycler_view.setNestedScrollingEnabled(false);
+//        InnerSubSecAdapter adapter = new InnerSubSecAdapter(context, list.get(position).getInnerSubSection());
+//        holder.recycler_view.setAdapter(adapter);
     }
 
     @Override

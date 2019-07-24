@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.covert.verify360.BeanClasses.FormElementDatum;
 import com.covert.verify360.BeanClasses.Items;
@@ -39,9 +40,9 @@ public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.
     public void onBindViewHolder(@NonNull MainSectionAdapter.ViewHolder holder, int position) {
         holder.main_section.setText(formElementDatumList.get(position).getMainSection());
 //        final int length = formElementDatumList.get(position).getOuterSubSection().size();
-
+        Toast.makeText(context,formElementDatumList.get(position).getIs_multiple(),Toast.LENGTH_SHORT).show();
         InnerSubSecAdapter adapter = new InnerSubSecAdapter(context,
-                formElementDatumList.get(position).getOuterSubSection());
+                formElementDatumList.get(position).getOuterSubSection(),formElementDatumList.get(position).getIs_multiple());
         holder.sub_sec_outer_list.setLayoutManager(new LinearLayoutManager(context));
         holder.sub_sec_outer_list.setNestedScrollingEnabled(false);
         holder.sub_sec_outer_list.setAdapter(adapter);

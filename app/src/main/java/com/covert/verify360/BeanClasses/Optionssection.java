@@ -11,6 +11,18 @@ public class Optionssection {
     @Expose
     private String options;
 
+    @SerializedName("mandatory_option")
+    @Expose
+    private String mandatory_option;
+
+    public String getMandatory_option() {
+        return mandatory_option;
+    }
+
+    public void setMandatory_option(String mandatory_option) {
+        this.mandatory_option = mandatory_option;
+    }
+
     private boolean isSelected = false;
 
     public Integer getFormElementId() {

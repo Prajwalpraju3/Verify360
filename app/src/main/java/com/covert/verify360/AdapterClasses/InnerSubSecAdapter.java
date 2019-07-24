@@ -21,10 +21,12 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
 
     private Context context;
     private List<InnerSubSection> list;
+    String mIs_multiple;
 
-    public InnerSubSecAdapter(Context context, List<InnerSubSection> list) {
+    public InnerSubSecAdapter(Context context, List<InnerSubSection> list, String is_multiple) {
         this.context = context;
         this.list = list;
+        mIs_multiple = is_multiple;
     }
 
     @NonNull
@@ -38,7 +40,7 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.txt_sub_sec_heading.setText(list.get(position).getSubSection());
 
-        RadioAdapter adapter = new RadioAdapter(context, list.get(position).getOptionssection(),
+        RadioAdapter adapter = new RadioAdapter(context,mIs_multiple, list.get(position).getOptionssection(),
                 new RadioAdapter.OnRadioClick() {
                     @Override
                     public void onItemChange(int pos) {
