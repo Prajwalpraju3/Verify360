@@ -21,10 +21,24 @@
         android:layout_marginTop="8dp">
     </android.support.v7.widget.RecyclerView>
 
-    <EditText
-        android:id="@+id/sub_sectionRemarks"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Remarks" />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal">
+       <EditText
+           android:id="@+id/sub_sectionRemarks"
+           android:layout_width="0dp"
+           android:layout_weight="9.5"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:hint="Remarks" />
+       <TextView
+           android:id="@+id/tv_mandate"
+           android:layout_width="0dp"
+           android:layout_weight="0.5"
+           android:visibility="invisible"
+           android:layout_height="wrap_content"
+           android:text="@string/star"
+           android:textColor="@color/md_red"/>
+   </LinearLayout>
 </LinearLayout>

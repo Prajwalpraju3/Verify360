@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -203,7 +204,12 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
                     if (!response.body().getError()) {
                         formElementData = response.body().getFormElementData();
                         mainSectionAdapter = new MainSectionAdapter(CaseResidentVerificationActivity.this,
-                                formElementData);
+                                formElementData, new MainSectionAdapter.OnMainClick() {
+                            @Override
+                            public void onChange(int pos,boolean value) {
+                                formElementData.get(pos).setVaidated(value);
+                            }
+                        });
                         recyclerViewResident.setAdapter(mainSectionAdapter);
                         progressBar.setVisibility(View.GONE);
                     } else {
@@ -230,30 +236,52 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
 
     private void submitForm() {
         Map<String, String> mMap = new HashMap<>();
-        if (formElementData != null && formElementData.size() > 0) {
-            for (int i = 0; i < formElementData.size(); i++) {
-                FormElementDatum datum = formElementData.get(i);
-                for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
-                    InnerSubSection section = datum.getOuterSubSection().get(j);
-                    String selectedId = "";
-                    String remark = "";
-                    for (int k = 0; k < section.getOptionssection().size(); k++) {
-                        if (section.getOptionssection().get(k).isSelected()){
-                            selectedId = "" + section.getOptionssection().get(k).getFormElementId();
-                            remark = section.getBuilder();
-                            mMap.put(selectedId, remark);
+
+        if (validated(formElementData)) {
+            if (formElementData != null && formElementData.size() > 0) {
+                for (int i = 0; i < formElementData.size(); i++) {
+                    FormElementDatum datum = formElementData.get(i);
+                    for (int j = 0; j < datum.getOuterSubSection().size(); j++) {
+                        InnerSubSection section = datum.getOuterSubSection().get(j);
+                        String selectedId = "";
+                        String remark = "";
+                        for (int k = 0; k < section.getOptionssection().size(); k++) {
+                            if (section.getOptionssection().get(k).isSelected()) {
+                                selectedId = "" + section.getOptionssection().get(k).getFormElementId();
+                                remark = section.getBuilder();
+                                mMap.put(selectedId, remark);
+                            }
                         }
                     }
                 }
             }
+
+            StringBuilder builder = new StringBuilder();
+            for (Map.Entry<String, String> entry :
+                    mMap.entrySet()) {
+                builder.append(entry.getKey() + "~" + entry.getValue() + "|");
+            }
+            submitFields(builder.toString());
+
+        } else {
+
+            Toast.makeText(this,"Please enter all mandatory fields...! ",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean validated(List<FormElementDatum> formElementData) {
+
+        for (int i =0;i<formElementData.size();i++){
+            if (!formElementData.get(i).isVaidated()){
+
+                Log.d("ttt", "validated: false");
+                return false;
+            }
         }
 
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, String> entry :
-                mMap.entrySet()) {
-            builder.append(entry.getKey() + "~" + entry.getValue() + "|");
-        }
-        submitFields(builder.toString());
+        return true;
+
+
     }
 
 

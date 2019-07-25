@@ -14,6 +14,16 @@ public class FormElementDatum {
     @Expose
     private String is_multiple;
 
+    private boolean vaidated =true;
+
+    public boolean isVaidated() {
+        return vaidated;
+    }
+
+    public void setVaidated(boolean vaidated) {
+        this.vaidated = vaidated;
+    }
+
     @SerializedName("sub_section")
     @Expose
     private List<InnerSubSection> outerSubSection = null;

@@ -10,6 +10,24 @@ public class InnerSubSection {
     @Expose
     private String subSection;
 
+    private boolean mandatory,havedata;
+
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+    public boolean isHavedata() {
+        return havedata;
+    }
+
+    public void setHavedata(boolean havedata) {
+        this.havedata = havedata;
+    }
+
     @SerializedName("optionssection")
     @Expose
     private List<Optionssection> optionssection = null;

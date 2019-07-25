@@ -26,5 +26,6 @@
     <string name="information">Information</string>
     <string name="user_name">BHAK S15</string>
     <string name="pin">Covert123</string>
+    <string name="star">*</string>
 
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +12,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.covert.verify360.BeanClasses.FormElementDatum;
+import com.covert.verify360.BeanClasses.InnerSubSection;
 import com.covert.verify360.BeanClasses.Items;
 import com.covert.verify360.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableMap;
 
 public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.ViewHolder> {
     private Context context;
     private List<FormElementDatum> formElementDatumList;
     private List<Items> items;
+    OnMainClick onMainClick;
 
-    public MainSectionAdapter(Context context, List<FormElementDatum> formElementDatumList) {
+    public MainSectionAdapter(Context context, List<FormElementDatum> formElementDatumList, OnMainClick onMainClick) {
         this.context = context;
         this.formElementDatumList = formElementDatumList;
         items = new ArrayList<>();
+        this.onMainClick = onMainClick;
     }
 
     @NonNull
@@ -40,9 +45,40 @@ public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.
     public void onBindViewHolder(@NonNull MainSectionAdapter.ViewHolder holder, int position) {
         holder.main_section.setText(formElementDatumList.get(position).getMainSection());
 //        final int length = formElementDatumList.get(position).getOuterSubSection().size();
-        Toast.makeText(context,formElementDatumList.get(position).getIs_multiple(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, formElementDatumList.get(position).getIs_multiple(), Toast.LENGTH_SHORT).show();
+
+
         InnerSubSecAdapter adapter = new InnerSubSecAdapter(context,
-                formElementDatumList.get(position).getOuterSubSection(),formElementDatumList.get(position).getIs_multiple());
+                formElementDatumList.get(position).getOuterSubSection(), formElementDatumList.get(position).getIs_multiple(), new InnerSubSecAdapter.OnSubClick() {
+            @Override
+            public void onItemChange(int pos) {
+                ArrayList<Boolean> booleanArrayList = new ArrayList<>();
+                List<InnerSubSection> innerSubSections = formElementDatumList.get(position).getOuterSubSection();
+                for (int i = 0; i < innerSubSections.size(); i++) {
+                    if (innerSubSections.get(i).isMandatory() && innerSubSections.get(i).isHavedata()) {
+                        booleanArrayList.add(true);
+                    } else if (innerSubSections.get(i).isMandatory() && !innerSubSections.get(i).isHavedata()) {
+                        booleanArrayList.add(false);
+                    } else {
+                        booleanArrayList.add(true);
+                    }
+                }
+
+                if (booleanArrayList.contains(false)) {
+                    Log.d("ttttt", "onItemChange:  contains false");
+                    formElementDatumList.get(position).setVaidated(false);
+                    onMainClick.onChange(pos,false);
+                } else {
+                    Log.d("ttttt", "onItemChange:  contains true");
+                    formElementDatumList.get(position).setVaidated(true);
+                    onMainClick.onChange(pos,true);
+                }
+
+
+            }
+        });
+
+
         holder.sub_sec_outer_list.setLayoutManager(new LinearLayoutManager(context));
         holder.sub_sec_outer_list.setNestedScrollingEnabled(false);
         holder.sub_sec_outer_list.setAdapter(adapter);
@@ -96,6 +132,10 @@ public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.
 //            });
 
         }
+    }
+
+    public interface OnMainClick{
+        void onChange(int pos,boolean value);
     }
 
     public List<Items> getItems() {
