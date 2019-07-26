@@ -207,7 +207,11 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
                                 formElementData, new MainSectionAdapter.OnMainClick() {
                             @Override
                             public void onChange(int pos,boolean value) {
-                                formElementData.get(pos).setVaidated(value);
+                                try {
+                                    formElementData.get(pos).setVaidated(value);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                         recyclerViewResident.setAdapter(mainSectionAdapter);

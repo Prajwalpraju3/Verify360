@@ -203,8 +203,11 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
                                 formElementData, new MainSectionAdapter.OnMainClick() {
                             @Override
                             public void onChange(int pos, boolean value) {
-                                Log.d("ttt", "onChange: " + value);
-                                formElementData.get(pos).setVaidated(value);
+                                try {
+                                    formElementData.get(pos).setVaidated(value);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                         recyclerViewBusiness.setAdapter(mainSectionAdapter);

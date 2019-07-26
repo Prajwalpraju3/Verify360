@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
@@ -14,8 +15,10 @@ import com.covert.verify360.R;
 
 import java.util.List;
 
-public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> {
+public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final int CHECK = 1;
+    private static final int RADIO = 2;
     private Context context;
     private List<Optionssection> list;
     private OnRadioClick onRadioClick;
@@ -30,27 +33,50 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_radio, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType ==RADIO){
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_radio, parent, false);
+            return new RadioViewHolder(view);
+        }else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.check_box, parent, false);
+            return new CheckBoxViewHolder(view);
+        }
+
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.btn_radio.setText(list.get(position).getOptions());
-        holder.btn_radio.setChecked(list.get(position).isSelected());
-        holder.btn_radio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isSelected = ((CompoundButton)v).isChecked();
-                if (isSelected) {
-                    check(position);
-                    notifyDataSetChanged();
-                    holder.btn_radio.clearFocus();
-                    onRadioClick.onItemChange(position);
+    public int getItemViewType(int position) {
+       if (mIs_multiple.matches("Y")){
+           return CHECK;
+       }else {
+           return RADIO;
+       }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+        if (holder.getItemViewType()==RADIO){
+            RadioViewHolder radioViewHolder = (RadioViewHolder)holder;
+            radioViewHolder.btn_radio.setText(list.get(position).getOptions());
+            radioViewHolder.btn_radio.setChecked(list.get(position).isSelected());
+            radioViewHolder.btn_radio.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isSelected = ((CompoundButton)v).isChecked();
+                    if (isSelected) {
+                        check(position);
+                        notifyDataSetChanged();
+                        radioViewHolder.btn_radio.clearFocus();
+                        onRadioClick.onItemChange(position);
+                    }
                 }
-            }
-        });
+            });
+        }else {
+            CheckBoxViewHolder checkBoxViewHolder = (CheckBoxViewHolder)holder;
+            checkBoxViewHolder.bt_check.setText(list.get(position).getOptions());
+        }
+
     }
 
     private void check(int pos){
@@ -69,11 +95,19 @@ public class RadioAdapter extends RecyclerView.Adapter<RadioAdapter.ViewHolder> 
         else return list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class RadioViewHolder extends RecyclerView.ViewHolder{
         RadioButton btn_radio;
-        public ViewHolder(View itemView) {
+        public RadioViewHolder(View itemView) {
             super(itemView);
             btn_radio = itemView.findViewById(R.id.btn_radio);
+        }
+    }
+
+    public class CheckBoxViewHolder extends RecyclerView.ViewHolder{
+        CheckBox bt_check;
+        public CheckBoxViewHolder(View itemView) {
+            super(itemView);
+            bt_check = itemView.findViewById(R.id.bt_check);
         }
     }
 
