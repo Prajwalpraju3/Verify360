@@ -1,6 +1,7 @@
 package com.covert.verify360.AdapterClasses;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Optionssection> list;
     private OnRadioClick onRadioClick;
     String mIs_multiple;
+    private long mLastClickTime = 0;
 
     public RadioAdapter(Context context,String is_multiple, List<Optionssection> list, OnRadioClick onRadioClick) {
         this.context = context;
@@ -75,6 +77,26 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }else {
             CheckBoxViewHolder checkBoxViewHolder = (CheckBoxViewHolder)holder;
             checkBoxViewHolder.bt_check.setText(list.get(position).getOptions());
+            checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
+            checkBoxViewHolder.bt_check.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+                        return;
+                    }
+                    mLastClickTime = SystemClock.elapsedRealtime();
+                    boolean isSelected = ((CompoundButton)v).isChecked();
+                    if (isSelected) {
+                        checkbox(position);
+                        notifyDataSetChanged();
+                        onRadioClick.onItemChange(position);
+                    }
+                    else {
+                        checkboxnegative(position);
+                    }
+                }
+            });
+
         }
 
     }
@@ -85,6 +107,26 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 list.get(i).setSelected(true);
             } else {
                 list.get(i).setSelected(false);
+            }
+        }
+    }
+
+    private void checkbox(int pos){
+        for (int i = 0; i < list.size(); i++) {
+            if (i == pos){
+                list.get(i).setSelected(true);
+            } else {
+//                list.get(i).setSelected(false);
+            }
+        }
+    }
+
+    private void checkboxnegative(int pos){
+        for (int i = 0; i < list.size(); i++) {
+            if (i == pos){
+                list.get(i).setSelected(false);
+            } else {
+//                list.get(i).setSelected(false);
             }
         }
     }

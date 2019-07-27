@@ -267,7 +267,8 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
             }
             submitFields(builder.toString());
 
-        } else {
+        }
+        else {
 
             Toast.makeText(this,"Please enter all mandatory fields...! ",Toast.LENGTH_SHORT).show();
         }
@@ -291,6 +292,7 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
 
     private void submitFields(String s) {
         MFormSubmissionService submissionService = FactoryService.createService(MFormSubmissionService.class);
+        Log.d("ttt", "submitFields: "+s);
         Call<ResponseMessage> call = submissionService.submitForm(case_id, case_detail_id, s,
                 working_by, 1);
         call.enqueue(new Callback<ResponseMessage>() {
