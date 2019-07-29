@@ -67,11 +67,11 @@ public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.
                 if (booleanArrayList.contains(false)) {
                     Log.d("ttttt", "onItemChange:  contains false");
                     formElementDatumList.get(position).setVaidated(false);
-                    onMainClick.onChange(pos,false);
+                    onMainClick.onChange(position,false);
                 } else {
                     Log.d("ttttt", "onItemChange:  contains true");
                     formElementDatumList.get(position).setVaidated(true);
-                    onMainClick.onChange(pos,true);
+                    onMainClick.onChange(position,true);
                 }
 
 
