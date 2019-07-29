@@ -24,6 +24,17 @@
     <string name="label_reasontocancel">Remarks</string>
     <string name="unable_to_process">We are unable to process your request now, please try again later.</string>
     <string name="information">Information</string>
+
+
+    <string-array name="selection_arrays">
+        <item>Please Select the Following</item>
+        <item>Owned</item>
+        <item>Rented</item>
+        <item>Leased</item>
+        <item>Company provided</item>
+    </string-array>
+
+
     <string name="user_name">BHAK S15</string>
     <string name="pin">Covert123</string>
     <string name="star">*</string>

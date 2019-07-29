@@ -15,12 +15,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MainSectionAdapter;
@@ -47,7 +50,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CaseResidentVerificationActivity extends AppCompatActivity {
+public class CaseResidentVerificationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     @BindView(R.id.linearLayoutresident)
     LinearLayout linearLayout;
     @BindView(R.id.enquirydetailslayout)
@@ -76,6 +79,11 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
     TextInputEditText rRel_with_applicant;
     @BindView(R.id.rOwned_Rented)
     TextInputEditText rOwned_Rented;
+    String rOwned_Rented_txt;
+
+
+
+
     @BindView(R.id.rYear_of_stay)
     TextInputEditText rYear_of_stay;
     @BindView(R.id.rNo_of_family_members)
@@ -159,6 +167,18 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         buttonEnquiryResident.setOnClickListener(v2 -> submitEnquiryDetails());
         buttonNeighbourCheck.setOnClickListener(v3 -> submitNeighbourDetails());
         buttonfinalStatus.setOnClickListener(v4 -> submitFinalStatus());
+
+
+        Spinner spinner = (Spinner) findViewById(R.id.rs_spinner);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.selection_arrays, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
 
@@ -507,9 +527,18 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
             isEmpty = true;
             rRel_with_applicant.setError("enter relationship with applicant");
         }
-        if (rOwned_Rented.getText().toString().trim().length() == 0) {
-            isEmpty = true;
-            rOwned_Rented.setError("enter owned or rented");
+
+        //old
+//        if (rOwned_Rented.getText().toString().trim().length() == 0) {
+//            isEmpty = true;
+//            rOwned_Rented.setError("enter owned or rented");
+//        }
+
+        //new
+
+        if (rOwned_Rented_txt.trim().length() == 0) {
+           Toast.makeText(this,"Please select the dropdown...",Toast.LENGTH_SHORT).show();
+           isEmpty = true;
         }
         if (rYear_of_stay.getText().toString().trim().length() == 0) {
             isEmpty = true;
@@ -542,9 +571,11 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         if (!isEmpty) {
             int id = radioGroupMarital.getCheckedRadioButtonId();
             RadioButton radioButton = findViewById(id);
+            Log.d("kkk", "submitEnquiryDetails: "+rOwned_Rented_txt);
             EnquiryDetailsService enquiryDetailsService = FactoryService.createService(EnquiryDetailsService.class);
             Call<ResponseMessage> call = enquiryDetailsService.submitEnquiryDetails(case_id, case_detail_id, rMet.getText().toString()
-                    , rRel_with_applicant.getText().toString(), rOwned_Rented.getText().toString(), radioButton.getText().toString()
+//                    , rRel_with_applicant.getText().toString(), rOwned_Rented.getText().toString(), radioButton.getText().toString()       old
+                    , rRel_with_applicant.getText().toString(), rOwned_Rented_txt, radioButton.getText().toString()
                     , rYear_of_stay.getText().toString(), rNo_of_family_members.getText().toString(), rNo_of_working.getText().toString()
                     , rCompanyName.getText().toString(), rDesignation.getText().toString(), rYear_of_exp.getText().toString(), working_by);
             call.enqueue(new Callback<ResponseMessage>() {
@@ -609,5 +640,33 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (position){
+
+            case 0:
+                rOwned_Rented_txt = "";
+                break;
+            case 1:
+                rOwned_Rented_txt = "Owned";
+                break;
+            case 2:
+                rOwned_Rented_txt = "Rented";
+                break;
+            case 3:
+                rOwned_Rented_txt = "Leased";
+                break;
+            case 4:
+                rOwned_Rented_txt = "Company provided";
+                break;
+        }
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
 
