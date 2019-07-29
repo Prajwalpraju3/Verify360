@@ -15,11 +15,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.covert.verify360.AdapterClasses.MainSectionAdapter;
@@ -46,7 +49,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CaseBusinessVerificationActivity extends AppCompatActivity {
+public class CaseBusinessVerificationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
     String case_id = null;
     String case_detail_id = null;
     String working_by = null;
@@ -79,8 +82,12 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
     TextInputEditText bMet;
     @BindView(R.id.bRelation_with_applicant)
     TextInputEditText bRelation_with_applicant;
+
+
     @BindView(R.id.bOwned_Rented)
     TextInputEditText bOwned_Rented;
+
+
     @BindView(R.id.bDesignation)
     TextInputEditText bDesignation;
     @BindView(R.id.bNo_years_operation)
@@ -129,6 +136,7 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
 
     @BindView(R.id.add_image)
     Button add_image;
+    String bOwned_Rented_txt;
 
 
     private Intent intent;
@@ -155,6 +163,18 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
         buttonNeighbourCheck.setOnClickListener(v1 -> submitNeighbourdetails());
         buttonfinalStatus.setOnClickListener(v2 -> submitfinalStatus());
         buttonsubmitEnquiry.setOnClickListener(v3 -> submitBusinessEnquiry());
+
+
+        Spinner spinner = (Spinner) findViewById(R.id.bs_spinner);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.selection_arrays, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
 
         sharedPreferences = this.getSharedPreferences("USER_DETAILS", Context.MODE_PRIVATE);
         intent = getIntent();
@@ -331,9 +351,17 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
             isEmpty = true;
             bRelation_with_applicant.setError("Enter relationship with applicant");
         }
-        if (bOwned_Rented.getText().toString().trim().length() == 0) {
+        //old
+//        if (bOwned_Rented.getText().toString().trim().length() == 0) {
+//            isEmpty = true;
+//            bOwned_Rented.setError("enter owned or rented");
+//        }
+
+        //new
+
+        if (bOwned_Rented_txt.trim().length() == 0) {
+            Toast.makeText(this,"Please select the dropdown...",Toast.LENGTH_SHORT).show();
             isEmpty = true;
-            bOwned_Rented.setError("Enter owned or rented");
         }
         if (byears_of_operation.getText().toString().trim().length() == 0) {
             isEmpty = true;
@@ -360,8 +388,11 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
 //            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
 
             BusinessEnquiryService businessEnquiryService = FactoryService.createService(BusinessEnquiryService.class);
+
+            Log.d("kkk", "submitEnquiryDetails: "+bOwned_Rented_txt);
             Call<ResponseMessage> call = businessEnquiryService.submitEnquiryDetails(case_id, case_detail_id, bMet.getText().toString()
-                    , bRelation_with_applicant.getText().toString(), bOwned_Rented.getText().toString(), byears_of_operation.getText().toString()
+//                    , bRelation_with_applicant.getText().toString(), bOwned_Rented.getText().toString(), byears_of_operation.getText().toString()     old
+                    , bRelation_with_applicant.getText().toString(), bOwned_Rented_txt, byears_of_operation.getText().toString()
                     , bNature_of_business.getText().toString(), bNo_of_employees.getText().toString(), bDesignation.getText().toString()
                     , bOtherRemarks.getText().toString(), working_by);
             call.enqueue(new Callback<ResponseMessage>() {
@@ -601,6 +632,35 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (position){
+
+            case 0:
+                bOwned_Rented_txt = "";
+                break;
+            case 1:
+                bOwned_Rented_txt = "Owned";
+                break;
+            case 2:
+                bOwned_Rented_txt = "Rented";
+                break;
+            case 3:
+                bOwned_Rented_txt = "Leased";
+                break;
+            case 4:
+                bOwned_Rented_txt = "Company provided";
+                break;
+        }
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     /*private void submitFields(int checkedRadioButtonId, String s) {
