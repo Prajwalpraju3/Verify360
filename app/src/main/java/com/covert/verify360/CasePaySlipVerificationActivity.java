@@ -251,6 +251,17 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         if (formElementData != null && formElementData.size() > 0) {
 
 
+            for(int j=0;j<formElementData.size();j++){
+                for(int i = 0;i<formElementData.get(j).getOuterSubSection().size();i++){
+                    if (!formElementData.get(j).getOuterSubSection().get(i).isCatagory_selected()){
+                        Toast.makeText(this,"Please fill all values...!",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+            }
+
+
+
             if (validated(formElementData)) {
                 for (int i = 0; i < formElementData.size(); i++) {
                     FormElementDatum datum = formElementData.get(i);

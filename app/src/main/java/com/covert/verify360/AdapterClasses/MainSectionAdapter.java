@@ -44,8 +44,7 @@ public class MainSectionAdapter extends RecyclerView.Adapter<MainSectionAdapter.
     @Override
     public void onBindViewHolder(@NonNull MainSectionAdapter.ViewHolder holder, int position) {
         holder.main_section.setText(formElementDatumList.get(position).getMainSection());
-//        final int length = formElementDatumList.get(position).getOuterSubSection().size();
-        Toast.makeText(context, formElementDatumList.get(position).getIs_multiple(), Toast.LENGTH_SHORT).show();
+//        final int lenh = formElementDatumList.get(position).getOuterSubSection().size();
 
 
         InnerSubSecAdapter adapter = new InnerSubSecAdapter(context,
