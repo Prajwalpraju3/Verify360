@@ -241,6 +241,15 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
     private void submitForm() {
         Map<String, String> mMap = new HashMap<>();
 
+        for(int j=0;j<formElementData.size();j++){
+            for(int i = 0;i<formElementData.get(j).getOuterSubSection().size();i++){
+                if (!formElementData.get(j).getOuterSubSection().get(i).isCatagory_selected()){
+                    Toast.makeText(this,"Please fill all values...!",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+
         if (validated(formElementData)) {
             if (formElementData != null && formElementData.size() > 0) {
                 for (int i = 0; i < formElementData.size(); i++) {
@@ -254,6 +263,8 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
                                 selectedId = "" + section.getOptionssection().get(k).getFormElementId();
                                 remark = section.getBuilder();
                                 mMap.put(selectedId, remark);
+                            }else {
+
                             }
                         }
                     }
@@ -278,8 +289,6 @@ public class CaseResidentVerificationActivity extends AppCompatActivity {
 
         for (int i =0;i<formElementData.size();i++){
             if (!formElementData.get(i).isVaidated()){
-
-                Log.d("ttt", "validated: false");
                 return false;
             }
         }

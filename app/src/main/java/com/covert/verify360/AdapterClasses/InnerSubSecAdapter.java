@@ -54,10 +54,13 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
                             list.get(position).setMandatory(false);
                             holder.tv_mandate.setVisibility(View.INVISIBLE);
                         }
+                        list.get(position).setCatagory_selected(true);
                         holder.sub_section_remarks.requestFocus();
                         onSubClick.onItemChange(pos);
                     }
                 });
+
+
         holder.sub_sec_outer_list.setLayoutManager(new LinearLayoutManager(context));
         holder.sub_sec_outer_list.setNestedScrollingEnabled(false);
         holder.sub_sec_outer_list.setAdapter(adapter);

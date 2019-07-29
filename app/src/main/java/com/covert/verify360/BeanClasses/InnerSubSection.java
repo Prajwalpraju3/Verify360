@@ -11,6 +11,15 @@ public class InnerSubSection {
     private String subSection;
 
     private boolean mandatory,havedata;
+    private boolean catagory_selected;
+
+    public boolean isCatagory_selected() {
+        return catagory_selected;
+    }
+
+    public void setCatagory_selected(boolean catagory_selected) {
+        this.catagory_selected = catagory_selected;
+    }
 
     public boolean isMandatory() {
         return mandatory;
