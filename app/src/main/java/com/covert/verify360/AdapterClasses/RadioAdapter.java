@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,23 +78,23 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }else {
             CheckBoxViewHolder checkBoxViewHolder = (CheckBoxViewHolder)holder;
             checkBoxViewHolder.bt_check.setText(list.get(position).getOptions());
-            checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
+//            checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
             checkBoxViewHolder.bt_check.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
-                        return;
-                    }
-                    mLastClickTime = SystemClock.elapsedRealtime();
-                    boolean isSelected = ((CompoundButton)v).isChecked();
+                    boolean isSelected = list.get(position).isSelected();
+                    Log.d("kkk", "onClick: isselected---->"+isSelected);
                     if (isSelected) {
-                        checkbox(position);
-                        notifyDataSetChanged();
+                        list.get(position).setSelected(false);
+                        checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
+
                         onRadioClick.onItemChange(position);
                     }
                     else {
-                        checkboxnegative(position);
+                        list.get(position).setSelected(true);
+                        checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
                     }
+//                    notifyDataSetChanged();
                 }
             });
 
@@ -114,9 +115,9 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private void checkbox(int pos){
         for (int i = 0; i < list.size(); i++) {
             if (i == pos){
-                list.get(i).setSelected(true);
+                list.get(i).setSelected(false);
             } else {
-//                list.get(i).setSelected(false);
+                list.get(i).setSelected(true);
             }
         }
     }
