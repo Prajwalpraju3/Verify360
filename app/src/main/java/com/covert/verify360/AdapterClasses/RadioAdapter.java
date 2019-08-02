@@ -1,7 +1,6 @@
 package com.covert.verify360.AdapterClasses;
 
 import android.content.Context;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -71,7 +70,7 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         check(position);
                         notifyDataSetChanged();
                         radioViewHolder.btn_radio.clearFocus();
-                        onRadioClick.onItemChange(position);
+                        onRadioClick.onItemChange(position,RADIO);
                     }
                 }
             });
@@ -88,12 +87,14 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         list.get(position).setSelected(false);
                         checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
 
-                        onRadioClick.onItemChange(position);
+
                     }
                     else {
                         list.get(position).setSelected(true);
                         checkBoxViewHolder.bt_check.setChecked(list.get(position).isSelected());
+
                     }
+                    onRadioClick.onItemChange(position,CHECK);
 //                    notifyDataSetChanged();
                 }
             });
@@ -155,6 +156,6 @@ public class RadioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public interface OnRadioClick{
-        void onItemChange(int pos);
+        void onItemChange(int pos, int type);
     }
 }

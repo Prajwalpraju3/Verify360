@@ -13,8 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.covert.verify360.BeanClasses.InnerSubSection;
+import com.covert.verify360.BeanClasses.Optionssection;
 import com.covert.verify360.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.ViewHolder> {
@@ -46,17 +48,38 @@ public class InnerSubSecAdapter extends RecyclerView.Adapter<InnerSubSecAdapter.
         RadioAdapter adapter = new RadioAdapter(context, mIs_multiple, list.get(position).getOptionssection(),
                 new RadioAdapter.OnRadioClick() {
                     @Override
-                    public void onItemChange(int pos) {
-                        if (list.get(position).getOptionssection().get(pos).getMandatory_option().matches("Y")) {
-                            list.get(position).setMandatory(true);
-                            holder.tv_mandate.setVisibility(View.VISIBLE);
-                        } else {
-                            list.get(position).setMandatory(false);
-                            holder.tv_mandate.setVisibility(View.INVISIBLE);
+                    public void onItemChange(int pos, int type) {
+
+                        Optionssection optionssection = list.get(position).getOptionssection().get(pos);
+                        List<Optionssection> optionssection_list = list.get(position).getOptionssection();
+                        if (type==2){
+                            if (optionssection.getMandatory_option().matches("Y")) {
+                                list.get(position).setMandatory(true);
+                                holder.tv_mandate.setVisibility(View.VISIBLE);
+                            } else {
+                                list.get(position).setMandatory(false);
+                                holder.tv_mandate.setVisibility(View.INVISIBLE);
+                            }
+                            list.get(position).setCatagory_selected(true);
+                            holder.sub_section_remarks.requestFocus();
+                            onSubClick.onItemChange(pos);
+                        }else if (type==1){
+                            holder.tv_mandate.setVisibility(View.GONE);
+                            list.get(position).setCatagory_selected(true);
+                            onSubClick.onItemChange(pos);
+
+                            for (int i = 0;i<optionssection_list.size();i++){
+                                if (optionssection_list.get(i).getMandatory_option().matches("Y")&&optionssection_list.get(i).isSelected()){
+                                    list.get(position).setMandatory(true);
+                                    list.get(position).setCatagory_selected(true);
+                                    holder.sub_section_remarks.requestFocus();
+                                    holder.tv_mandate.setVisibility(View.VISIBLE);
+                                    return;
+                                }
+                            }
+//notifyDataSetChanged();
                         }
-                        list.get(position).setCatagory_selected(true);
-                        holder.sub_section_remarks.requestFocus();
-                        onSubClick.onItemChange(pos);
+
                     }
                 });
 
