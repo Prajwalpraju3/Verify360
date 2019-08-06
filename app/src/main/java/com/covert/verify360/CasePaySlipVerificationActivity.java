@@ -45,6 +45,7 @@ import Services.FactoryService;
 import Services.FinalRemarks;
 import Services.IPendingCaseDetails;
 import Services.MFormSubmissionService;
+import Services.NeighbourCheckService;
 import Services.PaySlipenquiryService;
 import Services.UploadImage;
 import Utils.Constants;
@@ -96,6 +97,26 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
     @BindView(R.id.add_image)
     Button add_image;
 
+    @BindView(R.id.buttonNeighbourCheck)
+    Button buttonNeighbourCheck;
+
+    @BindView(R.id.neighbour1_Name)
+    TextInputEditText neighbour1_Name;
+    @BindView(R.id.neighbour1_Address)
+    TextInputEditText neighbour1_Address;
+    @BindView(R.id.neighbour1_Remarks)
+    TextInputEditText neighbour1_Remarks;
+
+    @BindView(R.id.radioGroupAdverse)
+    RadioGroup radioGroupAdverse;
+    @BindView(R.id.radioGroupConfirmedStay)
+    RadioGroup radioGroupConfirmedStay;
+    @BindView(R.id.radioGroupPoliticalContact)
+    RadioGroup radioGroupPoliticalContact;
+    @BindView(R.id.radioGroupRowdism)
+    RadioGroup radioGroupRowdism;
+
+
     private String case_id;
     private String case_detail_id;
     private String working_by;
@@ -122,6 +143,7 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
         buttonSubmitform.setOnClickListener(v1 -> submitForm());
         buttonSubmitPaySlipDetails.setOnClickListener(v1 -> submitPaySlipEnquiry());
         buttonfinalStatus.setOnClickListener(v2 -> submitfinalStatus());
+        buttonNeighbourCheck.setOnClickListener(v1 -> submitNeighbourdetails());
 
         intent = getIntent();
         if (intent != null) {
@@ -408,6 +430,150 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void submitNeighbourdetails() {
+        boolean isEmpty = false;
+        if (neighbour1_Name.getText().toString().trim().length() == 0) {
+            isEmpty = true;
+            neighbour1_Name.setError("enter neighbour 1 name");
+            return;
+        }
+
+        if (neighbour1_Address.getText().toString().trim().length() == 0) {
+            isEmpty = true;
+            neighbour1_Address.setError("enter neighbour 1 address");
+            return;
+        }
+        if (neighbour1_Remarks.getText().toString().trim().length() == 0) {
+            isEmpty = true;
+            neighbour1_Remarks.setError("enter neighbour 1 remarks");
+            return;
+        }
+        if (radioGroupAdverse.getCheckedRadioButtonId() == -1) {
+            isEmpty = true;
+            Toast.makeText(this, "Select neighbour adverse ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (radioGroupConfirmedStay.getCheckedRadioButtonId() == -1) {
+            isEmpty = true;
+            Toast.makeText(this, "Select neighbour confirmed stay ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (radioGroupPoliticalContact.getCheckedRadioButtonId() == -1) {
+            isEmpty = true;
+            Toast.makeText(this, "Select neighbour political contact ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (radioGroupRowdism.getCheckedRadioButtonId() == -1) {
+            isEmpty = true;
+            Toast.makeText(this, "Select neighbour rowdism ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!isEmpty) {
+//            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+            boolean adverseText, confirmedstay, political, rowdism;
+            RadioButton radioButtonAdverse = findViewById(radioGroupAdverse.getCheckedRadioButtonId());
+            if (radioButtonAdverse.getText().toString().equalsIgnoreCase("yes")) {
+                adverseText = true;
+            } else {
+                adverseText = false;
+            }
+            RadioButton radioButtonconfirmedStay = findViewById(radioGroupConfirmedStay.getCheckedRadioButtonId());
+            if (radioButtonconfirmedStay.getText().toString().equalsIgnoreCase("yes")) {
+                confirmedstay = true;
+            } else {
+                confirmedstay = false;
+            }
+            RadioButton radioButtonpolitical = findViewById(radioGroupPoliticalContact.getCheckedRadioButtonId());
+            if (radioButtonpolitical.getText().toString().equalsIgnoreCase("yes")) {
+                political = true;
+            } else {
+                political = false;
+            }
+            RadioButton radioButtonrowdism = findViewById(radioGroupRowdism.getCheckedRadioButtonId());
+            if (radioButtonrowdism.getText().toString().equalsIgnoreCase("yes")) {
+                rowdism = true;
+            } else {
+                rowdism = false;
+            }
+            NeighbourCheckService neighbourCheckService = FactoryService.createService(NeighbourCheckService.class);
+            Call<ResponseMessage> call1 = neighbourCheckService.submitNeighbourCheck(case_id, case_detail_id,
+                    neighbour1_Name.getText().toString(),
+                    neighbour1_Address.getText().toString(),
+                    neighbour1_Remarks.getText().toString(),
+                    adverseText, confirmedstay, political,
+                    rowdism,
+                    working_by, "1");
+
+            call1.enqueue(new Callback<ResponseMessage>() {
+                @Override
+                public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+                    if (response.isSuccessful()) {
+                        if (!response.body().isError()) {
+                            Toast.makeText(CasePaySlipVerificationActivity.this, "Neighbour 1 details submitted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(CasePaySlipVerificationActivity.this, "Failed, try again", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseMessage> call, Throwable t) {
+                    Toast.makeText(CasePaySlipVerificationActivity.this, "Something went wrong, try again ", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+//            boolean adverseText1, confirmedstay1, political1, rowdism1;
+//            RadioButton radioButtonAdverse1 = findViewById(radioGroupAdverse1.getCheckedRadioButtonId());
+//            if (radioButtonAdverse1.getText().toString().equalsIgnoreCase("yes")) {
+//                adverseText1 = true;
+//            } else {
+//                adverseText1 = false;
+//            }
+//            RadioButton radioButtonconfirmedStay1 = findViewById(radioGroupConfirmedStay1.getCheckedRadioButtonId());
+//            if (radioButtonconfirmedStay1.getText().toString().equalsIgnoreCase("yes")) {
+//                confirmedstay1 = true;
+//            } else {
+//                confirmedstay1 = false;
+//            }
+//            RadioButton radioButtonpolitical1 = findViewById(radioGroupPoliticalContact1.getCheckedRadioButtonId());
+//            if (radioButtonpolitical1.getText().toString().equalsIgnoreCase("yes")) {
+//                political1 = true;
+//            } else {
+//                political1 = false;
+//            }
+//            RadioButton radioButtonrowdism1 = findViewById(radioGroupRowdism1.getCheckedRadioButtonId());
+//            if (radioButtonrowdism1.getText().toString().equalsIgnoreCase("yes")) {
+//                rowdism1 = true;
+//            } else {
+//                rowdism1 = false;
+//            }
+//            NeighbourCheckService neighbourCheckService1 = FactoryService.createService(NeighbourCheckService.class);
+//            Call<ResponseMessage> call = neighbourCheckService1.submitNeighbourCheck(case_id, case_detail_id, neighbour2_Name.getText().toString()
+//                    , neighbour2_Address.getText().toString(), neighbour2_Remarks.getText().toString(),
+//                    adverseText1, confirmedstay1, political1, rowdism1, working_by, "1");
+//            call.enqueue(new Callback<ResponseMessage>() {
+//                @Override
+//                public void onResponse(Call<ResponseMessage> call, Response<ResponseMessage> response) {
+//                    if (response.isSuccessful()) {
+//                        if (!response.body().isError()) {
+//                            Toast.makeText(CasePaySlipVerificationActivity.this, "Neighbour 2 details submitted", Toast.LENGTH_SHORT).show();
+////                            viewGroupNeighbour.setVisibility(View.GONE);
+//                        } else {
+//                            Toast.makeText(CasePaySlipVerificationActivity.this, "Failed, try again", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ResponseMessage> call, Throwable t) {
+//                    Toast.makeText(CasePaySlipVerificationActivity.this, "Something went wrong, try again ", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+
+        }
     }
 
     @Override

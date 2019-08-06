@@ -88,6 +88,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutPayslip" />
 
+
+
             <Button
                 android:id="@+id/add_image"
                 android:layout_width="wrap_content"
@@ -98,6 +100,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/enquirydetailslayout" />
 
+            <include
+                android:id="@+id/neighbourlayoutsingle"
+                layout="@layout/layout_neighbour_check_single"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/add_image" />
+
 
             <include
                 android:id="@+id/layoutFinalStatus"
@@ -107,7 +119,7 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/add_image" />
+                app:layout_constraintTop_toBottomOf="@+id/neighbourlayoutsingle" />
 
 
 
