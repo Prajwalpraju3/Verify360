@@ -341,6 +341,8 @@ public class CasePaySlipVerificationActivity extends AppCompatActivity {
                     if (!response.body().isError()) {
                         Toast.makeText(CasePaySlipVerificationActivity.this,
                                 "Form details submitted", Toast.LENGTH_SHORT).show();
+                        buttonSubmitform.setText("Form submited");
+                        buttonSubmitform.setTextColor(getResources().getColor(R.color.md_red));
                     }
                 }
             }

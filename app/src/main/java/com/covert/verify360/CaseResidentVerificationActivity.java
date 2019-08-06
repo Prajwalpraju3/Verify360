@@ -331,6 +331,8 @@ public class CaseResidentVerificationActivity extends AppCompatActivity implemen
                     if (!response.body().isError()) {
                         Toast.makeText(CaseResidentVerificationActivity.this,
                                 "Form details submitted", Toast.LENGTH_SHORT).show();
+                        buttonSubmitForm.setText("Form submited");
+                        buttonSubmitForm.setTextColor(getResources().getColor(R.color.md_red));
                     }
                 }
             }

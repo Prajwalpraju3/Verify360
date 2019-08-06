@@ -329,6 +329,8 @@ public class CaseBusinessVerificationActivity extends AppCompatActivity implemen
                     if (!response.body().isError()) {
                         Toast.makeText(CaseBusinessVerificationActivity.this,
                                 "Form details submitted", Toast.LENGTH_SHORT).show();
+                        buttonsubmitForm.setText("Form submited");
+                        buttonsubmitForm.setTextColor(getResources().getColor(R.color.md_red));
                     }
                 }
             }
